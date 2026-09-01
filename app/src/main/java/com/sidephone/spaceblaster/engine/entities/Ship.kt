@@ -16,33 +16,106 @@ class Ship {
 	private var direction: Float = 0f // degrees, 0 is to the right, -90 is straight up
 	private var x: Float = 0f // px, center of the ship
 	private var y: Float = 0f // px, center of the ship
-	private var moveStepMax: Float = 1f
+	private var speedX = 0f
+	private var speedY = 0f
+	private var accelerationMax: Float = 1f
 	private var turnStepMax: Float = 1f
 
-	private var lastTurnTime = 0L // ms
+	private var lastThrustTime = 0L // ms
 	private var lastMoveTime = 0L // ms
+	private var lastTurnTime = 0L // ms
+
+	private var isThrusting = false
 
 
 	fun spawn(viewportWidth: Float, viewportHeight: Float) {
 		shipType = DefenderShip()
 
+		direction = shipType.drawDirection()
 		x = viewportWidth / 2f
 		y = viewportHeight / 2f
-		direction = shipType.drawDirection()
-		moveStepMax = shipType.moveSpeed() / Settings.TARGET_IPS.toFloat()
+		speedX = 0f
+		speedY = 0f
+		accelerationMax = shipType.acceleration() / Settings.TARGET_IPS.toFloat()
 		turnStepMax = shipType.turnSpeed() / Settings.TARGET_IPS.toFloat()
 
-		drawCommands = shipType.drawCommands()
+		isThrusting = false
 	}
 
 
-	fun moveForward(now: Long, viewportWidth: Float, viewportHeight: Float) {
-		val moveSpeed = (shipType.moveSpeed() * (now - lastMoveTime) / 1000f).coerceAtMost(moveStepMax)
-		lastMoveTime = now
+	/**
+	 * Calculate the new speed of the ship based on its acceleration and direction. This does NOT
+	 * change the position of the ship, that is done in move().
+	 */
+	fun thrust(now: Long, thrusting: Boolean) {
+		isThrusting = thrusting
+		if (!isThrusting) return
 
 		val angle = Math.toRadians(direction.toDouble())
-		x += moveSpeed * cos(angle).toFloat()
-		y += moveSpeed * sin(angle).toFloat()
+		val acceleration = shipType.acceleration()
+		val dt = (now - lastThrustTime) / 1000f
+		val moveSpeed = (acceleration * dt).coerceAtMost(accelerationMax)
+
+		speedX += (moveSpeed * cos(angle).toFloat())
+		speedY += (moveSpeed * sin(angle).toFloat())
+		speedX = speedX.coerceAtLeast(-DefenderShip.MAX_SPEED).coerceAtMost(DefenderShip.MAX_SPEED)
+		speedY = speedY.coerceAtLeast(-DefenderShip.MAX_SPEED).coerceAtMost(DefenderShip.MAX_SPEED)
+
+		lastThrustTime = now
+	}
+
+
+	/**
+	 * Calculate the new speed of the ship based on its braking power. This does NOT change the
+	 * position of the ship, that is done in move().
+	 */
+	fun stop(now: Long) {
+		val dt = (now - lastThrustTime) / 1000f
+		val braking = shipType.braking()
+		val moveSpeed = (braking * dt).coerceAtMost(accelerationMax)
+
+		if (speedX > 0) {
+			speedX -= moveSpeed
+			if (speedX < 0) speedX = 0f
+		} else if (speedX < 0) {
+			speedX += moveSpeed
+			if (speedX > 0) speedX = 0f
+		}
+
+		if (speedY > 0) {
+			speedY -= moveSpeed
+			if (speedY < 0) speedY = 0f
+		} else if (speedY < 0) {
+			speedY += moveSpeed
+			if (speedY > 0) speedY = 0f
+		}
+
+		lastThrustTime = now
+	}
+
+
+	/**
+	 * Change the ship orientation
+	 */
+	fun turn(now: Long, left: Boolean) {
+		val turnSpeed = (shipType.turnSpeed() * (now - lastTurnTime) / 1000f).coerceAtMost(turnStepMax)
+		lastTurnTime = now
+
+		direction += if (left) -turnSpeed else turnSpeed
+	}
+
+
+	/**
+	 * Use the current ship speed to calculate the new position of the ship based on the elapsed time
+	 * since the last move. Movement could occur after calling thrust(), but also when the ship is
+	 * coasting in space.
+	 */
+	fun move(now: Long, viewportWidth: Float, viewportHeight: Float) {
+		val dt = (now - lastMoveTime) / 1000f
+		lastMoveTime = now
+
+		x += speedX * dt
+		y += speedY * dt
 
 		// wrap around the screen edges
 		if (x < 0) x = viewportWidth
@@ -52,15 +125,12 @@ class Ship {
 	}
 
 
-	fun turn(now: Long, left: Boolean) {
-		val turnSpeed = (shipType.turnSpeed() * (now - lastTurnTime) / 1000f).coerceAtMost(turnStepMax)
-		lastTurnTime = now
-
-		direction += if (left) -turnSpeed else turnSpeed
-	}
-
-
-	fun draw(): DrawCommandGroup {
-		return DrawCommandGroup(x, y, direction - shipType.drawDirection(), drawCommands)
+	fun draw(now: Long): DrawCommandGroup {
+		return DrawCommandGroup(
+			x,
+			y,
+			direction - shipType.drawDirection(),
+			shipType.draw(now, isThrusting)
+		)
 	}
 }

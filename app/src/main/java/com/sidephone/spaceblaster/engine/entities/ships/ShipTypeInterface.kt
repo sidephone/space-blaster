@@ -4,8 +4,9 @@ import com.sidephone.spaceblaster.engine.graphics.DrawCommand
 
 interface ShipTypeInterface {
 	fun drawDirection(): Float
-	fun moveSpeed(): Float
+	fun acceleration(): Float
+	fun braking(): Float
 	fun turnSpeed(): Float
 	fun radius(): Float
-	fun drawCommands(): List<DrawCommand>
+	fun draw(now: Long, thrusting: Boolean): List<DrawCommand>
 }
