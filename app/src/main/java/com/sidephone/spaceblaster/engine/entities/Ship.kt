@@ -16,8 +16,8 @@ class Ship {
 	private var direction: Float = 0f // degrees, 0 is to the right, -90 is straight up
 	private var x: Float = 0f // px, center of the ship
 	private var y: Float = 0f // px, center of the ship
-	var moveStepMax: Float = 1f
-	var turnStepMax: Float = 1f
+	private var moveStepMax: Float = 1f
+	private var turnStepMax: Float = 1f
 
 	private var lastTurnTime = 0L // ms
 	private var lastMoveTime = 0L // ms
