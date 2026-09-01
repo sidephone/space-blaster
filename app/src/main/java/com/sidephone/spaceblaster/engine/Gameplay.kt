@@ -43,7 +43,7 @@ class Gameplay {
 	@Volatile private var firstIteration = true
 
 	// game objects
-	private val ship = Ship()
+	private val player = Ship()
 	private val space = Space()
 
 
@@ -60,7 +60,7 @@ class Gameplay {
 		pressedKeys = setOf()
 
 		space.bigBang(viewportWidth, viewportHeight)
-		ship.spawn(viewportWidth, viewportHeight)
+		player.spawn(viewportWidth, viewportHeight)
 
 		if (!isGameThreadAlive()) {
 			if (!executor.isShutdown && !executor.isTerminated) {
@@ -258,12 +258,12 @@ class Gameplay {
 		val leftPressed = KeyEvent.KEYCODE_DPAD_LEFT in keys
 		val rightPressed = KeyEvent.KEYCODE_DPAD_RIGHT in keys
 		if (leftPressed xor rightPressed) {
-			ship.turn(now, left = leftPressed)
+			player.turn(now, left = leftPressed)
 			actionTaken = true
 		}
 
 		if (KeyEvent.KEYCODE_DPAD_UP in keys) {
-			ship.moveForward(now, viewportWidth, viewportHeight)
+			player.moveForward(now, viewportWidth, viewportHeight)
 			actionTaken = true
 		}
 
@@ -294,7 +294,7 @@ class Gameplay {
 
 		val screenObjects = mutableListOf<DrawCommandGroup>()
 		screenObjects.add(space.draw(now))
-		screenObjects.add(ship.draw())
+		screenObjects.add(player.draw())
 		// add more game objects here, e.g., asteroids, bullets, etc.
 
 		currentFrame = GameFrame(Space.BACKGROUND, screenObjects)
