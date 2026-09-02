@@ -2,12 +2,15 @@ package com.sidephone.spaceblaster.engine.entities.ships
 
 import com.sidephone.spaceblaster.engine.graphics.DrawCommand
 
-class DefenderShip : ShipTypeInterface {
+class DefenderShip : ShipType {
 	companion object {
+		const val ACCELERATION = 225f // px/sec^2
+		const val BRAKING = ACCELERATION * 0.75f // px/sec^2
+		const val MAX_SPEED = 225f // px/sec
+		const val TURN_SPEED = 225f // degrees/sec
+
 		const val DRAW_DIRECTION = -90f // degrees, 0 is to the right, -90 is straight up
-		const val MOVE_SPEED = 220f // px per second
-		const val TURN_SPEED = 150f // degrees per second
-		const val RADIUS = 30f
+		const val RADIUS = 25f
 		const val SIZE_UNIT = RADIUS / 25.5f
 	}
 
@@ -42,6 +45,18 @@ class DefenderShip : ShipTypeInterface {
 	}
 
 
+	object Fire {
+		const val COLOR = 0XFFFFD700.toInt()
+		const val REAR_Y = Fuselage.WING_HOLDER_TOP + Fuselage.WING_HOLDER_HEIGHT
+		const val HALF_WIDTH = Fuselage.CENTER_HALF_WIDTH
+		const val PHASE_TIME = 60L // ms, time for each flame phase
+		val LENGTHS = floatArrayOf(15f, 21f, 17f, 24f, 18f, 22f)
+		val OFFSETS = floatArrayOf(0f, -1.5f, 1f, -2f, 2f, -0.5f)
+	}
+
+	private var drawCommandCache = emptyList<DrawCommand>()
+
+
 	override fun drawDirection(): Float {
 		// the model is drawn facing up, but since 0 degrees is to the right, we need to rotate it
 		// to appear and fly in the correct direction
@@ -49,8 +64,18 @@ class DefenderShip : ShipTypeInterface {
 	}
 
 
-	override fun moveSpeed(): Float {
-		return MOVE_SPEED
+	override fun acceleration(): Float {
+		return ACCELERATION
+	}
+
+
+	override fun braking(): Float {
+		return BRAKING
+	}
+
+
+	override fun maxSpeed(): Float {
+		return MAX_SPEED
 	}
 
 
@@ -64,8 +89,12 @@ class DefenderShip : ShipTypeInterface {
 	}
 
 
-	override fun drawCommands(): List<DrawCommand> {
-		return drawBody() + drawWings()
+	override fun draw(now: Long, thrusting: Boolean): List<DrawCommand> {
+		if (drawCommandCache.isEmpty()) {
+			drawCommandCache = drawBody() + drawWings()
+		}
+
+		return drawCommandCache + if (thrusting) drawThrustFire(now) else emptyList()
 	}
 
 
@@ -126,6 +155,24 @@ class DefenderShip : ShipTypeInterface {
 				Wing.COLOR,
 				filled = true
 			),
+		)
+	}
+
+
+	private fun drawThrustFire(now: Long): List<DrawCommand> {
+		val flamePhase = ((now / Fire.PHASE_TIME) % Fire.LENGTHS.size).toInt()
+
+		return listOf(
+			DrawCommand.Polygon(
+				points = listOf(
+					Pair(-Fire.HALF_WIDTH, Fire.REAR_Y),
+					Pair(Fire.OFFSETS[flamePhase], Fire.REAR_Y + Fire.LENGTHS[flamePhase]),
+					Pair(Fire.HALF_WIDTH, Fire.REAR_Y)
+				),
+				rotateDeg = 0f,
+				color = Fire.COLOR,
+				filled = true
+			)
 		)
 	}
 }

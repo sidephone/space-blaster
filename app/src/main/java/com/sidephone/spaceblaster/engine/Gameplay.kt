@@ -224,8 +224,8 @@ class Gameplay {
 	private fun advance() {
 		try {
 			val now = System.currentTimeMillis()
-			val inputCausedAction = processGameInput(now)
-			render(now, inputCausedAction)
+			processGameInput(now)
+			render(now)
 		} catch (e: Exception) {
 			Log.e(LOG_TAG, "Failed advancing ahead gameplay. ${e.message}", e)
 		}
@@ -250,24 +250,20 @@ class Gameplay {
 	 * objects on the screen.
 	 */
 	@WorkerThread
-	private fun processGameInput(now: Long): Boolean {
-		val keys = pressedKeys // make a copy for thread safety
-
-		var actionTaken = false
+	private fun processGameInput(now: Long) {
+		val keys = pressedKeys.toSet() // make a copy for thread safety
 
 		val leftPressed = KeyEvent.KEYCODE_DPAD_LEFT in keys
 		val rightPressed = KeyEvent.KEYCODE_DPAD_RIGHT in keys
 		if (leftPressed xor rightPressed) {
 			player.turn(now, left = leftPressed)
-			actionTaken = true
 		}
 
-		if (KeyEvent.KEYCODE_DPAD_UP in keys) {
-			player.moveForward(now, viewportWidth, viewportHeight)
-			actionTaken = true
+		if (KeyEvent.KEYCODE_BUTTON_Y in keys || KeyEvent.KEYCODE_DPAD_DOWN in keys) {
+			player.stop(now)
+		} else {
+			player.thrust(now, KeyEvent.KEYCODE_BUTTON_B in keys || KeyEvent.KEYCODE_DPAD_UP in keys)
 		}
-
-		return actionTaken
 	}
 
 
@@ -277,24 +273,12 @@ class Gameplay {
 	 * keys.
 	 */
 	@WorkerThread
-	private fun render(now: Long, inputCausedAction: Boolean) {
-		var isSceneChanged = inputCausedAction
-
-		if (firstIteration) {
-			firstIteration = false
-			isSceneChanged = true
-		}
-		if (space.shouldStarsTwinkle(now)) {
-			isSceneChanged = true
-		}
-
-		if (!isSceneChanged) {
-			return
-		}
+	private fun render(now: Long) {
+		player.move(now, viewportWidth, viewportHeight)
 
 		val screenObjects = mutableListOf<DrawCommandGroup>()
 		screenObjects.add(space.draw(now))
-		screenObjects.add(player.draw())
+		screenObjects.add(player.draw(now))
 		// add more game objects here, e.g., asteroids, bullets, etc.
 
 		currentFrame = GameFrame(Space.BACKGROUND, screenObjects)
