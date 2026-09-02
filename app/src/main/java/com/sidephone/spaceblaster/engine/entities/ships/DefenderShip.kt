@@ -5,7 +5,7 @@ import com.sidephone.spaceblaster.engine.graphics.DrawCommand
 class DefenderShip : ShipTypeInterface {
 	companion object {
 		const val ACCELERATION = 175f // px/sec^2
-		const val BRAKING = ACCELERATION * 0.6f // px/sec^2
+		const val BRAKING = ACCELERATION * 0.75f // px/sec^2
 		const val MAX_SPEED = 250f // px/sec
 		const val TURN_SPEED = 150f // degrees/sec
 

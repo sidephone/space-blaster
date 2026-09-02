@@ -54,9 +54,11 @@ class Ship {
 		isThrusting = thrusting
 		if (!isThrusting) return
 
+		val dt = (now - lastThrustTime) / 1000f
+		lastThrustTime = now
+
 		val angle = Math.toRadians(direction.toDouble())
 		val acceleration = shipType.acceleration()
-		val dt = (now - lastThrustTime) / 1000f
 		val moveSpeed = (acceleration * dt).coerceAtMost(accelerationMax)
 
 		speedX += (moveSpeed * cos(angle).toFloat())
@@ -68,8 +70,6 @@ class Ship {
 			speedX *= scale
 			speedY *= scale
 		}
-
-		lastThrustTime = now
 	}
 
 
@@ -80,15 +80,14 @@ class Ship {
 fun stop(now: Long) {
 	isThrusting = false
 
-	val dtMs = (now - lastThrustTime).coerceAtLeast(0L)
-	val dt = dtMs / 1000f
+	val dt = (now - lastThrustTime).coerceAtLeast(0L) / 1000f
 	lastThrustTime = now
 
 	val speed = sqrt(speedX * speedX + speedY * speedY)
 	if (speed <= 0f || dt <= 0f) return
 
-	val decel = (shipType.braking() * dt).coerceAtMost(brakingMax)
-	val newSpeed = (speed - decel).coerceAtLeast(0f)
+	val moveSpeed = (shipType.braking() * dt).coerceAtMost(brakingMax)
+	val newSpeed = (speed - moveSpeed).coerceAtLeast(0f)
 
 	if (newSpeed == 0f) {
 		speedX = 0f
