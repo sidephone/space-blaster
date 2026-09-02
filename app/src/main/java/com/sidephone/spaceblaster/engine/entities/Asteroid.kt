@@ -10,7 +10,7 @@ import kotlin.math.cos
 import kotlin.math.sin
 import kotlin.math.sqrt
 
-class Asteroid {
+class Asteroid : SpaceObject {
 	enum class SIZE {
 		LARGE, MEDIUM, SMALL
 	}
@@ -27,8 +27,13 @@ class Asteroid {
 	private var turnStepMax: Float = 1f
 	private var lastMoveTime = 0L // ms
 
+	private var isDead = false
 
-	fun radius(): Float = asteroidType.radius()
+
+	override fun isDead(): Boolean = isDead
+	override fun position(): Pair<Float, Float> = Pair(x, y)
+	override fun radius(): Float = asteroidType.radius()
+	override fun speed(): Pair<Float, Float> = Pair(speedX, speedY)
 	fun mass(): Float = asteroidType.mass()
 
 
@@ -63,26 +68,25 @@ class Asteroid {
 
 
 	/**
-	 * Checks whether this asteroid and `other` are close enough to collide
-	 * (distance between centers <= sum of radii) AND are currently
-	 * approaching each other (rather than already moving apart).
+	 * Checks whether this asteroid and the other object are close enough to collide(distance between
+	 * centers <= sum of radii) AND are currently approaching each other
 	 */
-	fun shouldBump(other: Asteroid): Boolean {
-		val dx = other.x - x
-		val dy = other.y - y
-		val distance = sqrt(dx * dx + dy * dy)
-		val combinedRadii = radius() + other.radius()
+	fun shouldBump(other: SpaceObject): Boolean {
+		val dx = other.position().first - x
+		val dy = other.position().second - y
+		val centerDistance = sqrt(dx * dx + dy * dy)
+		val surfaceDistance = radius() + other.radius()
 
-		if (distance > combinedRadii) {
+		if (centerDistance > surfaceDistance) {
 			return false
 		}
 
 		// Approaching if the relative velocity, projected onto the line
 		// connecting the two centers, points from us toward the other
 		// (i.e. the distance between them is decreasing).
-		val relativeVelocityX = speedX - other.speedX
-		val relativeVelocityY = speedY - other.speedY
-		val closingSpeed = relativeVelocityX * dx + relativeVelocityY * dy
+		val relativeSpeedX = speedX - other.speed().first
+		val relativeSpeedY = speedY - other.speed().second
+		val closingSpeed = relativeSpeedX * dx + relativeSpeedY * dy
 
 		return closingSpeed > 0f
 	}

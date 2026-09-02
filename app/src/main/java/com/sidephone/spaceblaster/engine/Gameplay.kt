@@ -49,6 +49,7 @@ class Gameplay(private val settings: Settings?) {
 
 	// game state
 	private var stage = 1
+	private var isGameOver = false
 
 
 	/**
@@ -58,6 +59,7 @@ class Gameplay(private val settings: Settings?) {
 	fun reset() {
 		pressedKeys = setOf()
 
+		isGameOver = false
 		stage = 1
 
 		space.bigBang(viewportWidth, viewportHeight)
@@ -115,6 +117,7 @@ class Gameplay(private val settings: Settings?) {
 
 		isPaused = false
 		pressedKeys = emptySet()
+		player.resetLives()
 
 		engineLooper = executor.scheduleWithFixedDelay(
 			{ advance() },
@@ -268,15 +271,14 @@ class Gameplay(private val settings: Settings?) {
 	}
 
 
-	/**
-	 * This is the main method that draws to the screen. In this demo, we draw a spaceship that can
-	 * move around the screen. The spaceship's position and direction are updated based on the pressed
-	 * keys.
-	 */
 	@WorkerThread
 	private fun render(now: Long) {
 		player.move(now, viewportWidth, viewportHeight)
-		asteroids.move(now, viewportWidth, viewportHeight)
+		asteroids.move(now, player, viewportWidth, viewportHeight)
+
+		if (asteroids.oneBumpsWithPlayer() >= 0) {
+			player.spawn(viewportWidth, viewportHeight)
+		}
 
 		val screenObjects = mutableListOf<DrawCommandGroup>()
 		screenObjects.add(space.draw(now))

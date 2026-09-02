@@ -11,6 +11,12 @@ class AsteroidList {
 	private val asteroids: MutableList<Asteroid> = mutableListOf()
 
 	private var bumpAsteroids = false
+	private var bumpsWithPlayer: Int = -1
+
+
+	fun oneBumpsWithPlayer(): Int {
+		return bumpsWithPlayer
+	}
 
 
 	fun spawn(
@@ -37,9 +43,13 @@ class AsteroidList {
 	}
 
 
-	fun move(now: Long, viewportWidth: Float, viewportHeight: Float) {
+	fun move(now: Long, player: Ship, viewportWidth: Float, viewportHeight: Float) {
+		bumpsWithPlayer = -1
+
 		for ((i, asteroid) in asteroids.withIndex()) {
-			if (bumpAsteroids) {
+			if (asteroid.shouldBump(player)) {
+				bumpsWithPlayer = i
+			} else if (bumpAsteroids) {
 				for (otherIndex in i + 1 until asteroids.size) {
 					if (asteroid.shouldBump(asteroids[otherIndex])) {
 						asteroid.bump(asteroids[otherIndex])

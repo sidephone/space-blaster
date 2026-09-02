@@ -9,7 +9,11 @@ import kotlin.math.sin
 import kotlin.math.sqrt
 
 
-class Ship {
+class Ship : SpaceObject {
+	companion object {
+		const val STARTING_LIVES = 3
+	}
+
 	private var shipType: ShipType = DefenderShip()
 
 	private var direction: Float = 0f // degrees, 0 is to the right, -90 is straight up
@@ -28,8 +32,18 @@ class Ship {
 
 	private var isThrusting = false
 
+	private var lives = STARTING_LIVES
+
+
+	override fun isDead(): Boolean = lives <= 0
+	override fun position(): Pair<Float, Float> = Pair(x, y)
+	override fun radius(): Float = shipType.radius()
+	override fun speed(): Pair<Float, Float> = Pair(speedX, speedY)
+
 
 	fun spawn(viewportWidth: Float, viewportHeight: Float) {
+		if (isDead()) return
+
 		shipType = DefenderShip()
 
 		direction = shipType.drawDirection()
@@ -47,16 +61,12 @@ class Ship {
 		lastTurnTime = 0L
 
 		isThrusting = false
+		lives--
 	}
 
 
-	fun position(): Pair<Float, Float> {
-		return Pair(x, y)
-	}
-
-
-	fun radius(): Float {
-		return shipType.radius()
+	fun resetLives() {
+		lives = STARTING_LIVES
 	}
 
 
@@ -65,6 +75,8 @@ class Ship {
 	 * change the position of the ship, that is done in move().
 	 */
 	fun thrust(now: Long, thrusting: Boolean) {
+		if (isDead()) return
+
 		isThrusting = thrusting
 		if (!isThrusting) return
 
@@ -92,6 +104,8 @@ class Ship {
 	 * position of the ship, that is done in move().
 	 */
 	fun stop(now: Long) {
+		if (isDead()) return
+
 		isThrusting = false
 
 		val dt = (now - lastThrustTime).coerceAtLeast(0L) / 1000f
@@ -119,6 +133,8 @@ class Ship {
 	 * Change the ship orientation
 	 */
 	fun turn(now: Long, left: Boolean) {
+		if (isDead()) return
+
 		val turnSpeed = (shipType.turnSpeed() * (now - lastTurnTime) / 1000f).coerceAtMost(turnStepMax)
 		lastTurnTime = now
 
@@ -132,6 +148,8 @@ class Ship {
 	 * coasting in space.
 	 */
 	fun move(now: Long, viewportWidth: Float, viewportHeight: Float) {
+		if (isDead()) return
+
 		val dt = ((now - lastMoveTime) / 1000f).coerceAtMost(moveDtMax)
 		lastMoveTime = now
 
@@ -147,6 +165,10 @@ class Ship {
 
 
 	fun draw(now: Long): DrawCommandGroup {
+		if (isDead()) {
+			return DrawCommandGroup(0f, 0f, 0f, emptyList())
+		}
+
 		return DrawCommandGroup(
 			x,
 			y,
