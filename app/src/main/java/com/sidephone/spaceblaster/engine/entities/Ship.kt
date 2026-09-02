@@ -4,6 +4,7 @@ import com.sidephone.spaceblaster.engine.entities.ships.DefenderShip
 import com.sidephone.spaceblaster.engine.entities.ships.ShipType
 import com.sidephone.spaceblaster.engine.graphics.DrawCommandGroup
 import com.sidephone.spaceblaster.settings.Settings
+import kotlin.math.atan2
 import kotlin.math.cos
 import kotlin.math.sin
 import kotlin.math.sqrt
@@ -39,6 +40,8 @@ class Ship : SpaceObject {
 	override fun position(): Pair<Float, Float> = Pair(x, y)
 	override fun radius(): Float = shipType.radius()
 	override fun speed(): Pair<Float, Float> = Pair(speedX, speedY)
+	fun minAsteroidSpawnDistance(): Float = shipType.radius() * 3f
+	fun speedDirection(): Float = Math.toDegrees(atan2(speedY.toDouble(), speedX.toDouble())).toFloat()
 
 
 	fun spawn(viewportWidth: Float, viewportHeight: Float) {

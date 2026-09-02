@@ -276,7 +276,9 @@ class Gameplay(private val settings: Settings?) {
 		player.move(now, viewportWidth, viewportHeight)
 		asteroids.move(now, player, viewportWidth, viewportHeight)
 
-		if (asteroids.oneBumpsWithPlayer() >= 0) {
+		val asteroidIndex = asteroids.oneBumpsWithPlayer()
+		if (asteroidIndex >= 0) {
+			asteroids.split(asteroidIndex, player, viewportWidth, viewportHeight)
 			player.spawn(viewportWidth, viewportHeight)
 		}
 

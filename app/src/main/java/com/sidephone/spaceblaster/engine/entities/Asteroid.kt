@@ -34,30 +34,42 @@ class Asteroid : SpaceObject {
 	override fun position(): Pair<Float, Float> = Pair(x, y)
 	override fun radius(): Float = asteroidType.radius()
 	override fun speed(): Pair<Float, Float> = Pair(speedX, speedY)
+
+	fun isLarge(): Boolean = asteroidType is LargeAsteroid
+	fun isMedium(): Boolean = asteroidType is MediumAsteroid
 	fun mass(): Float = asteroidType.mass()
 
 
 	/**
 	 * Spawn a random asteroid of a given size, not too close to the player
 	 */
-	fun spawn(size: SIZE, playerPosition: Pair<Float, Float>, minDistanceToPlayer: Float, viewportWidth: Float, viewportHeight: Float): Asteroid {
+	fun spawn(size: SIZE, spawnPosition: Pair<Float, Float>?, direction: Float?, playerPosition: Pair<Float, Float>, minDistanceToPlayer: Float, viewportWidth: Float, viewportHeight: Float): Asteroid {
 		asteroidType = when (size) {
 			SIZE.LARGE -> LargeAsteroid()
 			SIZE.MEDIUM -> MediumAsteroid()
 			SIZE.SMALL -> SmallAsteroid()
 		}
 
-		var distanceToPlayer: Float
-		do {
-			x = (viewportWidth * Math.random()).toFloat()
-			y = (viewportHeight * Math.random()).toFloat()
-			distanceToPlayer = sqrt((x - playerPosition.first) * (x - playerPosition.first) + (y - playerPosition.second) * (y - playerPosition.second))
-		} while (distanceToPlayer < minDistanceToPlayer)
+		if (spawnPosition == null) {
+			var distanceToPlayer: Float
+			do {
+				x = (viewportWidth * Math.random()).toFloat()
+				y = (viewportHeight * Math.random()).toFloat()
+				distanceToPlayer = sqrt((x - playerPosition.first) * (x - playerPosition.first) + (y - playerPosition.second) * (y - playerPosition.second))
+			} while (distanceToPlayer < minDistanceToPlayer)
+		} else {
+			x = spawnPosition.first
+			y = spawnPosition.second
+		}
 
+		if (direction != null) {
+			this.direction = direction
+		} else {
+			this.direction = 360f * Math.random().toFloat()
+		}
 
-		direction = 360f * Math.random().toFloat()
-		speedX = asteroidType.speed() * cos(Math.toRadians(direction.toDouble())).toFloat()
-		speedY = asteroidType.speed() * sin(Math.toRadians(direction.toDouble())).toFloat()
+		speedX = asteroidType.speed() * cos(Math.toRadians(this.direction.toDouble())).toFloat()
+		speedY = asteroidType.speed() * sin(Math.toRadians(this.direction.toDouble())).toFloat()
 
 		moveDtMax = 10f / Settings.Gameplay.TARGET_IPS.toFloat()
 		turnStepMax = asteroidType.turnSpeed() / Settings.Gameplay.TARGET_IPS.toFloat()
@@ -72,6 +84,8 @@ class Asteroid : SpaceObject {
 	 * centers <= sum of radii) AND are currently approaching each other
 	 */
 	fun shouldBump(other: SpaceObject): Boolean {
+		if (other.isDead()) return false
+
 		val dx = other.position().first - x
 		val dy = other.position().second - y
 		val centerDistance = sqrt(dx * dx + dy * dy)

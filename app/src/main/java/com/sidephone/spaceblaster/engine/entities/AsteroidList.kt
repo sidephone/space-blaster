@@ -29,13 +29,14 @@ class AsteroidList {
 		bumpAsteroids = settings?.getAsteroidsBump() == true
 
 		asteroids.clear()
-		val minDistanceToPlayer = player.radius() * 3f
 
 		for (i in 1 until MIN_ASTEROIDS + stage) {
 			asteroids.add(Asteroid().spawn(
-				Asteroid.SIZE.entries.random(),
+				Asteroid.SIZE.LARGE,
+				null,
+				null,
 				player.position(),
-				minDistanceToPlayer,
+				player.minAsteroidSpawnDistance(),
 				viewportWidth,
 				viewportHeight
 			))
@@ -58,6 +59,33 @@ class AsteroidList {
 			}
 
 			asteroid.move(now, viewportWidth, viewportHeight)
+		}
+	}
+
+
+	fun split(index: Int, player: Ship, viewportWidth: Float, viewportHeight: Float) {
+		val asteroid = asteroids.removeAt(index)
+
+		val newType = if (asteroid.isLarge()) {
+			Asteroid.SIZE.MEDIUM
+		} else if (asteroid.isMedium()) {
+			Asteroid.SIZE.SMALL
+		} else {
+			return
+		}
+
+		for (i in 1..2) {
+			val newDirection = player.speedDirection() + (15f - 30f * Math.random().toFloat())
+
+			asteroids.add(Asteroid().spawn(
+				newType,
+				asteroid.position(),
+				newDirection,
+				player.position(),
+				player.minAsteroidSpawnDistance(),
+				viewportWidth,
+				viewportHeight
+			))
 		}
 	}
 

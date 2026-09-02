@@ -2,10 +2,9 @@
 An Asteroids-style game for Sidephone.
 
 ## TODO
-- Asteroid splitting
+- After crashing, make the ship blink and make it invincible for 2 seconds
 - Explosions
 - Countdown before stage
-- After crashing, respawn after 1 second
 - Shooting (+ setting to wrap around the screen)
 - Saucers
 - Score + Bonuses (lives, faster shooting)
