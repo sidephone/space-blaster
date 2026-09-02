@@ -5,6 +5,7 @@ import android.view.KeyEvent
 import androidx.annotation.AnyThread
 import androidx.annotation.MainThread
 import androidx.annotation.WorkerThread
+import com.sidephone.spaceblaster.engine.entities.AsteroidList
 import com.sidephone.spaceblaster.engine.entities.Ship
 import com.sidephone.spaceblaster.engine.entities.Space
 import com.sidephone.spaceblaster.engine.graphics.DrawCommandGroup
@@ -40,16 +41,14 @@ class Gameplay {
 	@Volatile private var viewportWidth = 1f
 	@Volatile private var viewportHeight = 1f
 	@Volatile var currentFrame: GameFrame = GameFrame()
-	@Volatile private var firstIteration = true
 
 	// game objects
 	private val player = Ship()
 	private val space = Space()
+	private var asteroids = AsteroidList()
 
-
-	init {
-	    reset()
-	}
+	// game state
+	private var stage = 1
 
 
 	/**
@@ -59,8 +58,11 @@ class Gameplay {
 	fun reset() {
 		pressedKeys = setOf()
 
+		stage = 1
+
 		space.bigBang(viewportWidth, viewportHeight)
 		player.spawn(viewportWidth, viewportHeight)
+		asteroids.spawn(stage, player, viewportWidth, viewportHeight)
 
 		if (!isGameThreadAlive()) {
 			if (!executor.isShutdown && !executor.isTerminated) {
@@ -112,19 +114,18 @@ class Gameplay {
 		}
 
 		isPaused = false
-		firstIteration = true
 		pressedKeys = emptySet()
 
 		engineLooper = executor.scheduleWithFixedDelay(
 			{ advance() },
 			0,
-			1_000_000_000L / Settings.TARGET_IPS,
+			1_000_000_000L / Settings.Gameplay.TARGET_IPS,
 			TimeUnit.NANOSECONDS
 		)
 
 		onStarted()
 
-		Log.d(LOG_TAG, "Gameplay loop started at ${Settings.TARGET_IPS} iterations per second")
+		Log.d(LOG_TAG, "Gameplay loop started at ${Settings.Gameplay.TARGET_IPS} iterations per second")
 	}
 
 
@@ -275,11 +276,12 @@ class Gameplay {
 	@WorkerThread
 	private fun render(now: Long) {
 		player.move(now, viewportWidth, viewportHeight)
+		asteroids.move(now, viewportWidth, viewportHeight)
 
 		val screenObjects = mutableListOf<DrawCommandGroup>()
 		screenObjects.add(space.draw(now))
 		screenObjects.add(player.draw(now))
-		// add more game objects here, e.g., asteroids, bullets, etc.
+		screenObjects.addAll(asteroids.draw(now))
 
 		currentFrame = GameFrame(Space.BACKGROUND, screenObjects)
 	}

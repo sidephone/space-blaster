@@ -37,16 +37,26 @@ class Ship {
 		y = viewportHeight / 2f
 		speedX = 0f
 		speedY = 0f
-		accelerationMax = shipType.acceleration() / Settings.TARGET_IPS.toFloat()
-		brakingMax = shipType.braking() / Settings.TARGET_IPS.toFloat()
-		moveDtMax = 10f / Settings.TARGET_IPS.toFloat()
-		turnStepMax = shipType.turnSpeed() / Settings.TARGET_IPS.toFloat()
+		accelerationMax = shipType.acceleration() / Settings.Gameplay.TARGET_IPS.toFloat()
+		brakingMax = shipType.braking() / Settings.Gameplay.TARGET_IPS.toFloat()
+		moveDtMax = 10f / Settings.Gameplay.TARGET_IPS.toFloat()
+		turnStepMax = shipType.turnSpeed() / Settings.Gameplay.TARGET_IPS.toFloat()
 
 		lastThrustTime = 0L
 		lastMoveTime = 0L
 		lastTurnTime = 0L
 
 		isThrusting = false
+	}
+
+
+	fun position(): Pair<Float, Float> {
+		return Pair(x, y)
+	}
+
+
+	fun radius(): Float {
+		return shipType.radius()
 	}
 
 
