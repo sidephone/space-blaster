@@ -77,29 +77,29 @@ class Ship {
 	 * Calculate the new speed of the ship based on its braking power. This does NOT change the
 	 * position of the ship, that is done in move().
 	 */
-	fun stop(now: Long) {
-		val dt = (now - lastThrustTime) / 1000f
-		val braking = shipType.braking()
-		val moveSpeed = (braking * dt).coerceAtMost(brakingMax)
+fun stop(now: Long) {
+	isThrusting = false
 
-		if (speedX > 0) {
-			speedX -= moveSpeed
-			if (speedX < 0) speedX = 0f
-		} else if (speedX < 0) {
-			speedX += moveSpeed
-			if (speedX > 0) speedX = 0f
-		}
+	val dtMs = (now - lastThrustTime).coerceAtLeast(0L)
+	val dt = dtMs / 1000f
+	lastThrustTime = now
 
-		if (speedY > 0) {
-			speedY -= moveSpeed
-			if (speedY < 0) speedY = 0f
-		} else if (speedY < 0) {
-			speedY += moveSpeed
-			if (speedY > 0) speedY = 0f
-		}
+	val speed = sqrt(speedX * speedX + speedY * speedY)
+	if (speed <= 0f || dt <= 0f) return
 
-		lastThrustTime = now
+	val decel = (shipType.braking() * dt).coerceAtMost(brakingMax)
+	val newSpeed = (speed - decel).coerceAtLeast(0f)
+
+	if (newSpeed == 0f) {
+		speedX = 0f
+		speedY = 0f
+		return
 	}
+
+	val scale = newSpeed / speed
+	speedX *= scale
+	speedY *= scale
+}
 
 
 	/**
