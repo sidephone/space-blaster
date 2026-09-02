@@ -4,13 +4,13 @@ import com.sidephone.spaceblaster.engine.graphics.DrawCommand
 
 class DefenderShip : ShipType {
 	companion object {
-		const val ACCELERATION = 175f // px/sec^2
+		const val ACCELERATION = 225f // px/sec^2
 		const val BRAKING = ACCELERATION * 0.75f // px/sec^2
-		const val MAX_SPEED = 250f // px/sec
-		const val TURN_SPEED = 150f // degrees/sec
+		const val MAX_SPEED = 225f // px/sec
+		const val TURN_SPEED = 225f // degrees/sec
 
 		const val DRAW_DIRECTION = -90f // degrees, 0 is to the right, -90 is straight up
-		const val RADIUS = 30f
+		const val RADIUS = 25f
 		const val SIZE_UNIT = RADIUS / 25.5f
 	}
 

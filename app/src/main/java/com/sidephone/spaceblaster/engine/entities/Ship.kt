@@ -42,6 +42,10 @@ class Ship {
 		moveDtMax = 10f / Settings.TARGET_IPS.toFloat()
 		turnStepMax = shipType.turnSpeed() / Settings.TARGET_IPS.toFloat()
 
+		lastThrustTime = 0L
+		lastMoveTime = 0L
+		lastTurnTime = 0L
+
 		isThrusting = false
 	}
 
