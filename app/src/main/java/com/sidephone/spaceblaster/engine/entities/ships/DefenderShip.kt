@@ -74,6 +74,11 @@ class DefenderShip : ShipTypeInterface {
 	}
 
 
+	override fun maxSpeed(): Float {
+		return MAX_SPEED
+	}
+
+
 	override fun turnSpeed(): Float {
 		return TURN_SPEED
 	}

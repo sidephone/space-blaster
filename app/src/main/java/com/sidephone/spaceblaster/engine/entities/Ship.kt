@@ -7,6 +7,7 @@ import com.sidephone.spaceblaster.engine.graphics.DrawCommandGroup
 import com.sidephone.spaceblaster.settings.Settings
 import kotlin.math.cos
 import kotlin.math.sin
+import kotlin.math.sqrt
 
 
 class Ship {
@@ -19,6 +20,7 @@ class Ship {
 	private var speedX = 0f
 	private var speedY = 0f
 	private var accelerationMax: Float = 1f
+	private var brakingMax: Float = 1f
 	private var turnStepMax: Float = 1f
 
 	private var lastThrustTime = 0L // ms
@@ -37,6 +39,7 @@ class Ship {
 		speedX = 0f
 		speedY = 0f
 		accelerationMax = shipType.acceleration() / Settings.TARGET_IPS.toFloat()
+		brakingMax = shipType.braking() / Settings.TARGET_IPS.toFloat()
 		turnStepMax = shipType.turnSpeed() / Settings.TARGET_IPS.toFloat()
 
 		isThrusting = false
@@ -58,8 +61,13 @@ class Ship {
 
 		speedX += (moveSpeed * cos(angle).toFloat())
 		speedY += (moveSpeed * sin(angle).toFloat())
-		speedX = speedX.coerceAtLeast(-DefenderShip.MAX_SPEED).coerceAtMost(DefenderShip.MAX_SPEED)
-		speedY = speedY.coerceAtLeast(-DefenderShip.MAX_SPEED).coerceAtMost(DefenderShip.MAX_SPEED)
+
+		val speed = sqrt(speedX * speedX + speedY * speedY)
+		if (speed > shipType.maxSpeed()) {
+			val scale = shipType.maxSpeed() / speed
+			speedX *= scale
+			speedY *= scale
+		}
 
 		lastThrustTime = now
 	}
@@ -72,7 +80,7 @@ class Ship {
 	fun stop(now: Long) {
 		val dt = (now - lastThrustTime) / 1000f
 		val braking = shipType.braking()
-		val moveSpeed = (braking * dt).coerceAtMost(accelerationMax)
+		val moveSpeed = (braking * dt).coerceAtMost(brakingMax)
 
 		if (speedX > 0) {
 			speedX -= moveSpeed
