@@ -2,7 +2,7 @@ package com.sidephone.spaceblaster.engine.entities.ships
 
 import com.sidephone.spaceblaster.engine.graphics.DrawCommand
 
-interface ShipTypeInterface {
+interface ShipType {
 	fun drawDirection(): Float
 	fun acceleration(): Float
 	fun braking(): Float

@@ -2,7 +2,7 @@ package com.sidephone.spaceblaster.engine.entities.ships
 
 import com.sidephone.spaceblaster.engine.graphics.DrawCommand
 
-class DefenderShip : ShipTypeInterface {
+class DefenderShip : ShipType {
 	companion object {
 		const val ACCELERATION = 175f // px/sec^2
 		const val BRAKING = ACCELERATION * 0.75f // px/sec^2
@@ -166,7 +166,7 @@ class DefenderShip : ShipTypeInterface {
 			DrawCommand.Polygon(
 				points = listOf(
 					Pair(-Fire.HALF_WIDTH, Fire.REAR_Y),
-					Pair( Fire.OFFSETS[flamePhase], Fire.REAR_Y + Fire.LENGTHS[flamePhase]),
+					Pair(Fire.OFFSETS[flamePhase], Fire.REAR_Y + Fire.LENGTHS[flamePhase]),
 					Pair(Fire.HALF_WIDTH, Fire.REAR_Y)
 				),
 				rotateDeg = 0f,

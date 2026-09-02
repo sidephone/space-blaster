@@ -1,7 +1,7 @@
 package com.sidephone.spaceblaster.engine.entities
 
 import com.sidephone.spaceblaster.engine.entities.ships.DefenderShip
-import com.sidephone.spaceblaster.engine.entities.ships.ShipTypeInterface
+import com.sidephone.spaceblaster.engine.entities.ships.ShipType
 import com.sidephone.spaceblaster.engine.graphics.DrawCommandGroup
 import com.sidephone.spaceblaster.settings.Settings
 import kotlin.math.cos
@@ -10,7 +10,7 @@ import kotlin.math.sqrt
 
 
 class Ship {
-	private var shipType: ShipTypeInterface = DefenderShip()
+	private var shipType: ShipType = DefenderShip()
 
 	private var direction: Float = 0f // degrees, 0 is to the right, -90 is straight up
 	private var x: Float = 0f // px, center of the ship
@@ -19,6 +19,7 @@ class Ship {
 	private var speedY = 0f
 	private var accelerationMax: Float = 1f
 	private var brakingMax: Float = 1f
+	private var moveDtMax: Float = 1f
 	private var turnStepMax: Float = 1f
 
 	private var lastThrustTime = 0L // ms
@@ -38,6 +39,7 @@ class Ship {
 		speedY = 0f
 		accelerationMax = shipType.acceleration() / Settings.TARGET_IPS.toFloat()
 		brakingMax = shipType.braking() / Settings.TARGET_IPS.toFloat()
+		moveDtMax = 10f / Settings.TARGET_IPS.toFloat()
 		turnStepMax = shipType.turnSpeed() / Settings.TARGET_IPS.toFloat()
 
 		isThrusting = false
@@ -75,28 +77,28 @@ class Ship {
 	 * Calculate the new speed of the ship based on its braking power. This does NOT change the
 	 * position of the ship, that is done in move().
 	 */
-fun stop(now: Long) {
-	isThrusting = false
+	fun stop(now: Long) {
+		isThrusting = false
 
-	val dt = (now - lastThrustTime).coerceAtLeast(0L) / 1000f
-	lastThrustTime = now
+		val dt = (now - lastThrustTime).coerceAtLeast(0L) / 1000f
+		lastThrustTime = now
 
-	val speed = sqrt(speedX * speedX + speedY * speedY)
-	if (speed <= 0f || dt <= 0f) return
+		val speed = sqrt(speedX * speedX + speedY * speedY)
+		if (speed <= 0f || dt <= 0f) return
 
-	val moveSpeed = (shipType.braking() * dt).coerceAtMost(brakingMax)
-	val newSpeed = (speed - moveSpeed).coerceAtLeast(0f)
+		val moveSpeed = (shipType.braking() * dt).coerceAtMost(brakingMax)
+		val newSpeed = (speed - moveSpeed).coerceAtLeast(0f)
 
-	if (newSpeed == 0f) {
-		speedX = 0f
-		speedY = 0f
-		return
+		if (newSpeed == 0f) {
+			speedX = 0f
+			speedY = 0f
+			return
+		}
+
+		val scale = newSpeed / speed
+		speedX *= scale
+		speedY *= scale
 	}
-
-	val scale = newSpeed / speed
-	speedX *= scale
-	speedY *= scale
-}
 
 
 	/**
@@ -116,7 +118,7 @@ fun stop(now: Long) {
 	 * coasting in space.
 	 */
 	fun move(now: Long, viewportWidth: Float, viewportHeight: Float) {
-		val dt = (now - lastMoveTime) / 1000f
+		val dt = ((now - lastMoveTime) / 1000f).coerceAtMost(moveDtMax)
 		lastMoveTime = now
 
 		x += speedX * dt
