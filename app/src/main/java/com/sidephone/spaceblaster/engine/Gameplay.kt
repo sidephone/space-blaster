@@ -63,7 +63,7 @@ class Gameplay(private val settings: Settings?) {
 		stage = 1
 
 		space.bigBang(viewportWidth, viewportHeight)
-		player.spawn(viewportWidth, viewportHeight)
+		player.spawn(System.currentTimeMillis(), viewportWidth, viewportHeight)
 		asteroids.spawn(settings, stage, player, viewportWidth, viewportHeight)
 
 		if (!isGameThreadAlive()) {
@@ -273,19 +273,20 @@ class Gameplay(private val settings: Settings?) {
 
 	@WorkerThread
 	private fun render(now: Long) {
+		player.revokeInvincibilityWhenExpired(now)
 		player.move(now, viewportWidth, viewportHeight)
-		asteroids.move(now, player, viewportWidth, viewportHeight)
 
+		asteroids.move(now, player, viewportWidth, viewportHeight)
 		val asteroidIndex = asteroids.oneBumpsWithPlayer()
 		if (asteroidIndex >= 0) {
 			asteroids.split(asteroidIndex, player, viewportWidth, viewportHeight)
-			player.spawn(viewportWidth, viewportHeight)
+			player.spawn(now, viewportWidth, viewportHeight)
 		}
 
 		val screenObjects = mutableListOf<DrawCommandGroup>()
 		screenObjects.add(space.draw(now))
-		screenObjects.add(player.draw(now))
 		screenObjects.addAll(asteroids.draw(now))
+		screenObjects.add(player.draw(now))
 
 		currentFrame = GameFrame(Space.BACKGROUND, screenObjects)
 	}

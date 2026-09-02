@@ -30,7 +30,7 @@ class Asteroid : SpaceObject {
 	private var isDead = false
 
 
-	override fun isDead(): Boolean = isDead
+	override fun notBumpable(): Boolean = isDead
 	override fun position(): Pair<Float, Float> = Pair(x, y)
 	override fun radius(): Float = asteroidType.radius()
 	override fun speed(): Pair<Float, Float> = Pair(speedX, speedY)
@@ -84,7 +84,7 @@ class Asteroid : SpaceObject {
 	 * centers <= sum of radii) AND are currently approaching each other
 	 */
 	fun shouldBump(other: SpaceObject): Boolean {
-		if (other.isDead()) return false
+		if (other.notBumpable()) return false
 
 		val dx = other.position().first - x
 		val dy = other.position().second - y

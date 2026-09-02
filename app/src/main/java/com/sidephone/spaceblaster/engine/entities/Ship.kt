@@ -13,6 +13,7 @@ import kotlin.math.sqrt
 class Ship : SpaceObject {
 	companion object {
 		const val STARTING_LIVES = 3
+		const val INVINCIBILITY_DURATION = 2000L // ms
 	}
 
 	private var shipType: ShipType = DefenderShip()
@@ -32,11 +33,13 @@ class Ship : SpaceObject {
 	private var lastTurnTime = 0L // ms
 
 	private var isThrusting = false
+	private var isInvincible = false
+	private var invincibilityTimeout = 0L // ms
 
 	private var lives = STARTING_LIVES
 
 
-	override fun isDead(): Boolean = lives <= 0
+	override fun notBumpable(): Boolean = lives <= 0 || isInvincible
 	override fun position(): Pair<Float, Float> = Pair(x, y)
 	override fun radius(): Float = shipType.radius()
 	override fun speed(): Pair<Float, Float> = Pair(speedX, speedY)
@@ -44,8 +47,8 @@ class Ship : SpaceObject {
 	fun speedDirection(): Float = Math.toDegrees(atan2(speedY.toDouble(), speedX.toDouble())).toFloat()
 
 
-	fun spawn(viewportWidth: Float, viewportHeight: Float) {
-		if (isDead()) return
+	fun spawn(now: Long, viewportWidth: Float, viewportHeight: Float) {
+		if (lives <= 0) return
 
 		shipType = DefenderShip()
 
@@ -64,6 +67,9 @@ class Ship : SpaceObject {
 		lastTurnTime = 0L
 
 		isThrusting = false
+		isInvincible = true
+		invincibilityTimeout = now + INVINCIBILITY_DURATION
+
 		lives--
 	}
 
@@ -78,7 +84,7 @@ class Ship : SpaceObject {
 	 * change the position of the ship, that is done in move().
 	 */
 	fun thrust(now: Long, thrusting: Boolean) {
-		if (isDead()) return
+		if (lives <= 0) return
 
 		isThrusting = thrusting
 		if (!isThrusting) return
@@ -107,7 +113,7 @@ class Ship : SpaceObject {
 	 * position of the ship, that is done in move().
 	 */
 	fun stop(now: Long) {
-		if (isDead()) return
+		if (lives <= 0) return
 
 		isThrusting = false
 
@@ -136,7 +142,7 @@ class Ship : SpaceObject {
 	 * Change the ship orientation
 	 */
 	fun turn(now: Long, left: Boolean) {
-		if (isDead()) return
+		if (lives <= 0) return
 
 		val turnSpeed = (shipType.turnSpeed() * (now - lastTurnTime) / 1000f).coerceAtMost(turnStepMax)
 		lastTurnTime = now
@@ -151,7 +157,7 @@ class Ship : SpaceObject {
 	 * coasting in space.
 	 */
 	fun move(now: Long, viewportWidth: Float, viewportHeight: Float) {
-		if (isDead()) return
+		if (lives <= 0) return
 
 		val dt = ((now - lastMoveTime) / 1000f).coerceAtMost(moveDtMax)
 		lastMoveTime = now
@@ -167,16 +173,25 @@ class Ship : SpaceObject {
 	}
 
 
+	fun revokeInvincibilityWhenExpired(now: Long) {
+		if (now >= invincibilityTimeout) {
+			isInvincible = false
+		}
+	}
+
+
 	fun draw(now: Long): DrawCommandGroup {
-		if (isDead()) {
+		if (lives <= 0) {
 			return DrawCommandGroup(0f, 0f, 0f, emptyList())
 		}
+
+		val blink = (isInvincible && (now % 200L < 100L))
 
 		return DrawCommandGroup(
 			x,
 			y,
 			direction - shipType.drawDirection(),
-			shipType.draw(now, isThrusting)
+			if (blink) emptyList() else shipType.draw(now, isThrusting)
 		)
 	}
 }
