@@ -22,19 +22,19 @@ import com.sidephone.spaceblaster.screens.MainMenuScreen
 import com.sidephone.spaceblaster.screens.ScreenType
 import com.sidephone.spaceblaster.screens.SettingsScreen
 import com.sidephone.spaceblaster.screens.game.GameScreen
+import com.sidephone.spaceblaster.settings.Settings
 import com.sidephone.spaceblaster.ui.theme.GameTheme
 
 
-/**
- * Main activity of the game. It displays all screens, coordinates communication between the game
- * components, and passes input to the game engine.
- */
 class MainActivity : ComponentActivity() {
 	private var gamepad = Gamepad()
-	private var gameplay = Gameplay()
+	private var gameplay: Gameplay = Gameplay(null)
 
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
+
+		val settings = Settings(this)
+		gameplay = Gameplay(settings)
 
 		enableEdgeToEdge()
 		switchToFullScreen()

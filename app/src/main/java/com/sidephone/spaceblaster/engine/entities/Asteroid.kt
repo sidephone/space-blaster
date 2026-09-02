@@ -1,6 +1,5 @@
 package com.sidephone.spaceblaster.engine.entities
 
-import android.util.Log
 import com.sidephone.spaceblaster.engine.entities.asteroids.AsteroidType
 import com.sidephone.spaceblaster.engine.entities.asteroids.LargeAsteroid
 import com.sidephone.spaceblaster.engine.entities.asteroids.MediumAsteroid
@@ -12,10 +11,6 @@ import kotlin.math.sin
 import kotlin.math.sqrt
 
 class Asteroid {
-	companion object {
-		const val MIN_AMOUNT = 4
-	}
-
 	enum class SIZE {
 		LARGE, MEDIUM, SMALL
 	}
@@ -31,6 +26,10 @@ class Asteroid {
 	private var moveDtMax: Float = 1f
 	private var turnStepMax: Float = 1f
 	private var lastMoveTime = 0L // ms
+
+
+	fun radius(): Float = asteroidType.radius()
+	fun mass(): Float = asteroidType.mass()
 
 
 	/**
@@ -63,13 +62,71 @@ class Asteroid {
 	}
 
 
+	/**
+	 * Checks whether this asteroid and `other` are close enough to collide
+	 * (distance between centers <= sum of radii) AND are currently
+	 * approaching each other (rather than already moving apart).
+	 */
+	fun shouldBump(other: Asteroid): Boolean {
+		val dx = other.x - x
+		val dy = other.y - y
+		val distance = sqrt(dx * dx + dy * dy)
+		val combinedRadii = radius() + other.radius()
+
+		if (distance > combinedRadii) {
+			return false
+		}
+
+		// Approaching if the relative velocity, projected onto the line
+		// connecting the two centers, points from us toward the other
+		// (i.e. the distance between them is decreasing).
+		val relativeVelocityX = speedX - other.speedX
+		val relativeVelocityY = speedY - other.speedY
+		val closingSpeed = relativeVelocityX * dx + relativeVelocityY * dy
+
+		return closingSpeed > 0f
+	}
+
+	/**
+	 * Re-calculate the speed of this asteroid and `other` when they collide, assuming a perfectly
+	 * elastic collision. Positions are not changed, move() will handle that in the next frame by
+	 * using the new speedX and speedY values.
+	 */
+	fun bump(other: Asteroid) {
+		val dx = other.x - x
+		val dy = other.y - y
+		val distance = sqrt(dx * dx + dy * dy)
+
+		if (distance == 0f) {
+			return // avoid division by zero for exactly-overlapping centers
+		}
+
+		// unit normal along the line connecting the two centers
+		val nx = dx / distance
+		val ny = dy / distance
+
+		val relativeSpeedX = speedX - other.speedX
+		val relativeSpeedY = speedY - other.speedY
+		val speedAlongNormal = relativeSpeedX * nx + relativeSpeedY * ny
+
+		if (speedAlongNormal <= 0f) {
+			return // already flying apart, nothing to do
+		}
+
+		// elastic collision impulse magnitude along the normal
+		val impulse = (2f * speedAlongNormal) / (mass() + other.mass())
+
+		speedX -= impulse * other.mass() * nx
+		speedY -= impulse * other.mass() * ny
+		other.speedX += impulse * mass() * nx
+		other.speedY += impulse * mass() * ny
+	}
+
+
 	fun move(now: Long, viewportWidth: Float, viewportHeight: Float) {
 		val dt = ((now - lastMoveTime) / 1000f).coerceAtMost(moveDtMax)
 		var turnSpeed = (asteroidType.turnSpeed() * (now - lastMoveTime) / 1000f)
 		turnSpeed = turnSpeed.coerceAtMost(turnStepMax).coerceAtLeast(-turnStepMax)
-
-		val oldX = x
-		val oldY = y
 
 		direction += turnSpeed
 		x += speedX * dt

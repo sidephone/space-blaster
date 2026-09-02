@@ -4,13 +4,18 @@ import com.sidephone.spaceblaster.engine.graphics.DrawCommand
 
 class SmallAsteroid : AsteroidType {
 	companion object {
-		const val RADIUS = 15f
+		const val RADIUS = 10f
 		const val SPEED = 100f // px/sec
 		const val TURN_SPEED = 60f // degrees/sec
+		const val MASS = RADIUS * RADIUS
 
 		const val SURFACE_COLOR = 0xFFCCCCCC.toInt()
 
 		const val POINTS = 4
+	}
+
+	override fun mass(): Float {
+		return MASS
 	}
 
 	override fun radius(): Float {

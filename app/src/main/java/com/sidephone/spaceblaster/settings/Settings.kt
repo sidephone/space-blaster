@@ -18,6 +18,6 @@ class Settings(context: android.content.Context) {
 
 
 	fun getAsteroidsBump(): Boolean {
-		return sharedPreferences.getBoolean(ASTEROIDS_BUMP_KEY, false)
+		return sharedPreferences.getBoolean(ASTEROIDS_BUMP_KEY, true)
 	}
 }

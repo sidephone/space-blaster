@@ -7,10 +7,15 @@ class LargeAsteroid : AsteroidType {
 		const val RADIUS = 35f
 		const val SPEED = 50f // px/sec
 		const val TURN_SPEED = 30f // degrees/sec
+		const val MASS = RADIUS * RADIUS
 
 		const val SURFACE_COLOR = 0xFF888888.toInt()
 
 		const val POINTS = 1
+	}
+
+	override fun mass(): Float {
+		return MASS
 	}
 
 	override fun radius(): Float {

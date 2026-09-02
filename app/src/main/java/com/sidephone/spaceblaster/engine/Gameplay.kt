@@ -20,7 +20,7 @@ import java.util.concurrent.TimeUnit
  * The main game engine class. It contains the game loop, input handling, and game state management.
  * It is designed to be simple and easy to understand, so you can modify it to create your own game.
  */
-class Gameplay {
+class Gameplay(private val settings: Settings?) {
 	companion object {
 		private val LOG_TAG = Gameplay::class.java.simpleName
 	}
@@ -62,7 +62,7 @@ class Gameplay {
 
 		space.bigBang(viewportWidth, viewportHeight)
 		player.spawn(viewportWidth, viewportHeight)
-		asteroids.spawn(stage, player, viewportWidth, viewportHeight)
+		asteroids.spawn(settings, stage, player, viewportWidth, viewportHeight)
 
 		if (!isGameThreadAlive()) {
 			if (!executor.isShutdown && !executor.isTerminated) {
