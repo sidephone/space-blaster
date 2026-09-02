@@ -2,7 +2,6 @@ package com.sidephone.spaceblaster.engine.entities
 
 import com.sidephone.spaceblaster.engine.entities.ships.DefenderShip
 import com.sidephone.spaceblaster.engine.entities.ships.ShipTypeInterface
-import com.sidephone.spaceblaster.engine.graphics.DrawCommand
 import com.sidephone.spaceblaster.engine.graphics.DrawCommandGroup
 import com.sidephone.spaceblaster.settings.Settings
 import kotlin.math.cos
@@ -12,7 +11,6 @@ import kotlin.math.sqrt
 
 class Ship {
 	private var shipType: ShipTypeInterface = DefenderShip()
-	private var drawCommands: List<DrawCommand> = listOf()
 
 	private var direction: Float = 0f // degrees, 0 is to the right, -90 is straight up
 	private var x: Float = 0f // px, center of the ship
