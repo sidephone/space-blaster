@@ -251,7 +251,7 @@ class Gameplay {
 	 */
 	@WorkerThread
 	private fun processGameInput(now: Long) {
-		val keys = pressedKeys // make a copy for thread safety
+		val keys = pressedKeys.toSet() // make a copy for thread safety
 
 		val leftPressed = KeyEvent.KEYCODE_DPAD_LEFT in keys
 		val rightPressed = KeyEvent.KEYCODE_DPAD_RIGHT in keys
