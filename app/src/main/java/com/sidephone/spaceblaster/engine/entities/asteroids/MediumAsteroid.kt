@@ -15,7 +15,7 @@ class MediumAsteroid : AsteroidType() {
 
 	object Patch {
 		const val MIN = 2
-		const val MAX = 7
+		const val MAX = 6
 		const val COLOR_MIN = 0x7C // will result in: 0xff7c7c7c
 		const val COLOR_MAX = 0x88 // will result in: 0xff888888
 		const val RADIUS_MIN = RADIUS * 0.1f

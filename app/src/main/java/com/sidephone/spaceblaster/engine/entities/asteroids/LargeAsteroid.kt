@@ -17,7 +17,7 @@ class LargeAsteroid : AsteroidType() {
 
 	object Patch {
 		const val MIN = 3
-		const val MAX = 7
+		const val MAX = 6
 		const val COLOR_MIN = 0x60 // will result in: 0xff606060
 		const val COLOR_MAX = 0x70 // will result in: 0xff707070
 		const val RADIUS_MIN = RADIUS * 0.1f
