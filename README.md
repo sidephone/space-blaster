@@ -2,7 +2,7 @@
 An Asteroids-style game for Sidephone.
 
 ## TODO
-- After crashing, make the ship blink and make it invincible for 2 seconds
+- schedule rebirth in 2 seconds after dying, not immediately
 - Explosions
 - Countdown before stage
 - Shooting (+ setting to wrap around the screen)
