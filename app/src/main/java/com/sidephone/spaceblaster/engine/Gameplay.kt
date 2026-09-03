@@ -273,15 +273,15 @@ class Gameplay(private val settings: Settings?) {
 
 	@WorkerThread
 	private fun render(now: Long) {
+		player.autoSpawnAfterDeath(now, viewportWidth, viewportHeight)
 		player.revokeInvincibilityWhenExpired(now)
 		player.move(now, viewportWidth, viewportHeight)
 
 		asteroids.move(now, player, viewportWidth, viewportHeight)
 		val asteroidIndex = asteroids.oneBumpsWithPlayer()
 		if (asteroidIndex >= 0) {
-			player.die()
+			player.die(now)
 			asteroids.split(asteroidIndex, player, viewportWidth, viewportHeight)
-			player.spawn(now, viewportWidth, viewportHeight)
 		}
 
 		val screenObjects = mutableListOf<DrawCommandGroup>()
