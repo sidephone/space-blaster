@@ -5,6 +5,7 @@ import android.view.KeyEvent
 import androidx.annotation.AnyThread
 import androidx.annotation.MainThread
 import androidx.annotation.WorkerThread
+import com.sidephone.spaceblaster.engine.entities.AsteroidList
 import com.sidephone.spaceblaster.engine.entities.Ship
 import com.sidephone.spaceblaster.engine.entities.Space
 import com.sidephone.spaceblaster.engine.graphics.DrawCommandGroup
@@ -19,7 +20,7 @@ import java.util.concurrent.TimeUnit
  * The main game engine class. It contains the game loop, input handling, and game state management.
  * It is designed to be simple and easy to understand, so you can modify it to create your own game.
  */
-class Gameplay {
+class Gameplay(private val settings: Settings?) {
 	companion object {
 		private val LOG_TAG = Gameplay::class.java.simpleName
 	}
@@ -40,16 +41,15 @@ class Gameplay {
 	@Volatile private var viewportWidth = 1f
 	@Volatile private var viewportHeight = 1f
 	@Volatile var currentFrame: GameFrame = GameFrame()
-	@Volatile private var firstIteration = true
 
 	// game objects
 	private val player = Ship()
 	private val space = Space()
+	private var asteroids = AsteroidList()
 
-
-	init {
-	    reset()
-	}
+	// game state
+	private var stage = 1
+	private var isGameOver = false
 
 
 	/**
@@ -59,8 +59,13 @@ class Gameplay {
 	fun reset() {
 		pressedKeys = setOf()
 
+		isGameOver = false
+		stage = 1
+
 		space.bigBang(viewportWidth, viewportHeight)
-		player.spawn(viewportWidth, viewportHeight)
+		player.resetLives()
+		player.spawn(System.currentTimeMillis(), viewportWidth, viewportHeight)
+		asteroids.spawn(settings, stage, player, viewportWidth, viewportHeight)
 
 		if (!isGameThreadAlive()) {
 			if (!executor.isShutdown && !executor.isTerminated) {
@@ -112,19 +117,18 @@ class Gameplay {
 		}
 
 		isPaused = false
-		firstIteration = true
 		pressedKeys = emptySet()
 
 		engineLooper = executor.scheduleWithFixedDelay(
 			{ advance() },
 			0,
-			1_000_000_000L / Settings.TARGET_IPS,
+			1_000_000_000L / Settings.Gameplay.TARGET_IPS,
 			TimeUnit.NANOSECONDS
 		)
 
 		onStarted()
 
-		Log.d(LOG_TAG, "Gameplay loop started at ${Settings.TARGET_IPS} iterations per second")
+		Log.d(LOG_TAG, "Gameplay loop started at ${Settings.Gameplay.TARGET_IPS} iterations per second")
 	}
 
 
@@ -267,19 +271,23 @@ class Gameplay {
 	}
 
 
-	/**
-	 * This is the main method that draws to the screen. In this demo, we draw a spaceship that can
-	 * move around the screen. The spaceship's position and direction are updated based on the pressed
-	 * keys.
-	 */
 	@WorkerThread
 	private fun render(now: Long) {
+		player.revokeInvincibilityWhenExpired(now)
 		player.move(now, viewportWidth, viewportHeight)
+
+		asteroids.move(now, player, viewportWidth, viewportHeight)
+		val asteroidIndex = asteroids.oneBumpsWithPlayer()
+		if (asteroidIndex >= 0) {
+			player.die()
+			asteroids.split(asteroidIndex, player, viewportWidth, viewportHeight)
+			player.spawn(now, viewportWidth, viewportHeight)
+		}
 
 		val screenObjects = mutableListOf<DrawCommandGroup>()
 		screenObjects.add(space.draw(now))
+		screenObjects.addAll(asteroids.draw(now))
 		screenObjects.add(player.draw(now))
-		// add more game objects here, e.g., asteroids, bullets, etc.
 
 		currentFrame = GameFrame(Space.BACKGROUND, screenObjects)
 	}

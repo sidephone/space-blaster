@@ -4,12 +4,18 @@ import com.sidephone.spaceblaster.engine.entities.ships.DefenderShip
 import com.sidephone.spaceblaster.engine.entities.ships.ShipType
 import com.sidephone.spaceblaster.engine.graphics.DrawCommandGroup
 import com.sidephone.spaceblaster.settings.Settings
+import kotlin.math.atan2
 import kotlin.math.cos
 import kotlin.math.sin
 import kotlin.math.sqrt
 
 
-class Ship {
+class Ship : SpaceObject {
+	companion object {
+		const val STARTING_LIVES = 3
+		const val INVINCIBILITY_DURATION = 2000L // ms
+	}
+
 	private var shipType: ShipType = DefenderShip()
 
 	private var direction: Float = 0f // degrees, 0 is to the right, -90 is straight up
@@ -27,9 +33,29 @@ class Ship {
 	private var lastTurnTime = 0L // ms
 
 	private var isThrusting = false
+	private var isInvincible = false
+	private var invincibilityTimeout = 0L // ms
+
+	private var lives = STARTING_LIVES
 
 
-	fun spawn(viewportWidth: Float, viewportHeight: Float) {
+	override fun notBumpable(): Boolean = lives <= 0 || isInvincible
+	override fun position(): Pair<Float, Float> = Pair(x, y)
+	override fun radius(): Float = shipType.radius()
+	override fun speed(): Pair<Float, Float> = Pair(speedX, speedY)
+	fun minAsteroidSpawnDistance(): Float = shipType.radius() * 3f
+	fun speedDirection(): Float = Math.toDegrees(atan2(speedY.toDouble(), speedX.toDouble())).toFloat()
+
+
+	fun die() {
+		if (lives <= 0) return
+		lives--
+	}
+
+
+	fun spawn(now: Long, viewportWidth: Float, viewportHeight: Float) {
+		if (lives <= 0) return
+
 		shipType = DefenderShip()
 
 		direction = shipType.drawDirection()
@@ -37,16 +63,23 @@ class Ship {
 		y = viewportHeight / 2f
 		speedX = 0f
 		speedY = 0f
-		accelerationMax = shipType.acceleration() / Settings.TARGET_IPS.toFloat()
-		brakingMax = shipType.braking() / Settings.TARGET_IPS.toFloat()
-		moveDtMax = 10f / Settings.TARGET_IPS.toFloat()
-		turnStepMax = shipType.turnSpeed() / Settings.TARGET_IPS.toFloat()
+		accelerationMax = shipType.acceleration() / Settings.Gameplay.TARGET_IPS.toFloat()
+		brakingMax = shipType.braking() / Settings.Gameplay.TARGET_IPS.toFloat()
+		moveDtMax = 10f / Settings.Gameplay.TARGET_IPS.toFloat()
+		turnStepMax = shipType.turnSpeed() / Settings.Gameplay.TARGET_IPS.toFloat()
 
 		lastThrustTime = 0L
 		lastMoveTime = 0L
 		lastTurnTime = 0L
 
 		isThrusting = false
+		isInvincible = true
+		invincibilityTimeout = now + INVINCIBILITY_DURATION
+	}
+
+
+	fun resetLives() {
+		lives = STARTING_LIVES
 	}
 
 
@@ -55,6 +88,8 @@ class Ship {
 	 * change the position of the ship, that is done in move().
 	 */
 	fun thrust(now: Long, thrusting: Boolean) {
+		if (lives <= 0) return
+
 		isThrusting = thrusting
 		if (!isThrusting) return
 
@@ -82,6 +117,8 @@ class Ship {
 	 * position of the ship, that is done in move().
 	 */
 	fun stop(now: Long) {
+		if (lives <= 0) return
+
 		isThrusting = false
 
 		val dt = (now - lastThrustTime).coerceAtLeast(0L) / 1000f
@@ -109,6 +146,8 @@ class Ship {
 	 * Change the ship orientation
 	 */
 	fun turn(now: Long, left: Boolean) {
+		if (lives <= 0) return
+
 		val turnSpeed = (shipType.turnSpeed() * (now - lastTurnTime) / 1000f).coerceAtMost(turnStepMax)
 		lastTurnTime = now
 
@@ -122,6 +161,8 @@ class Ship {
 	 * coasting in space.
 	 */
 	fun move(now: Long, viewportWidth: Float, viewportHeight: Float) {
+		if (lives <= 0) return
+
 		val dt = ((now - lastMoveTime) / 1000f).coerceAtMost(moveDtMax)
 		lastMoveTime = now
 
@@ -136,12 +177,25 @@ class Ship {
 	}
 
 
+	fun revokeInvincibilityWhenExpired(now: Long) {
+		if (now >= invincibilityTimeout) {
+			isInvincible = false
+		}
+	}
+
+
 	fun draw(now: Long): DrawCommandGroup {
+		if (lives <= 0) {
+			return DrawCommandGroup(0f, 0f, 0f, emptyList())
+		}
+
+		val blink = (isInvincible && (now % 200L < 100L))
+
 		return DrawCommandGroup(
 			x,
 			y,
 			direction - shipType.drawDirection(),
-			shipType.draw(now, isThrusting)
+			if (blink) emptyList() else shipType.draw(now, isThrusting)
 		)
 	}
 }
