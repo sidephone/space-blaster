@@ -61,7 +61,7 @@ class Ship : SpaceObject {
 
 
 	fun die(now: Long) {
-		if (isDead(now)) return
+		if (lives <= 0) return
 		lives--
 		lastDeathTime = now
 	}
@@ -97,7 +97,7 @@ class Ship : SpaceObject {
 
 
 	fun spawn(now: Long, viewportWidth: Float, viewportHeight: Float) {
-		if (isDead(now)) return
+		if (lives <= 0) return
 
 		shipType = DefenderShip()
 
