@@ -8,6 +8,9 @@ import androidx.annotation.WorkerThread
 import com.sidephone.spaceblaster.engine.entities.AsteroidList
 import com.sidephone.spaceblaster.engine.entities.Ship
 import com.sidephone.spaceblaster.engine.entities.Space
+import com.sidephone.spaceblaster.engine.entities.explosions.Explosion
+import com.sidephone.spaceblaster.engine.entities.explosions.NullExplosion
+import com.sidephone.spaceblaster.engine.entities.explosions.ShipExplosion
 import com.sidephone.spaceblaster.engine.graphics.DrawCommandGroup
 import com.sidephone.spaceblaster.engine.graphics.GameFrame
 import com.sidephone.spaceblaster.settings.Settings
@@ -46,6 +49,7 @@ class Gameplay(private val settings: Settings?) {
 	private val player = Ship()
 	private val space = Space()
 	private var asteroids = AsteroidList()
+	private var playerExplosion: Explosion = NullExplosion()
 
 	// game state
 	private var stage = 1
@@ -276,11 +280,13 @@ class Gameplay(private val settings: Settings?) {
 		player.autoSpawnAfterDeath(now, viewportWidth, viewportHeight)
 		player.revokeInvincibilityWhenExpired(now)
 		player.move(now, viewportWidth, viewportHeight)
+		playerExplosion.spread(now)
 
 		asteroids.move(now, player, viewportWidth, viewportHeight)
 		val asteroidIndex = asteroids.oneBumpsWithPlayer()
 		if (asteroidIndex >= 0) {
 			player.die(now)
+			playerExplosion = ShipExplosion(now, player.position())
 			asteroids.split(asteroidIndex, player, viewportWidth, viewportHeight)
 		}
 
@@ -288,6 +294,7 @@ class Gameplay(private val settings: Settings?) {
 		screenObjects.add(space.draw(now))
 		screenObjects.addAll(asteroids.draw(now))
 		screenObjects.add(player.draw(now))
+		screenObjects.add(playerExplosion.draw(now))
 
 		currentFrame = GameFrame(Space.BACKGROUND, screenObjects)
 	}
