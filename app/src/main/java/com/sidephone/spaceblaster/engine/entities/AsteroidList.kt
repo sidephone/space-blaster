@@ -48,11 +48,11 @@ class AsteroidList {
 		bumpsWithPlayer = -1
 
 		for ((i, asteroid) in asteroids.withIndex()) {
-			if (asteroid.shouldBump(player)) {
+			if (asteroid.shouldBump(now, player)) {
 				bumpsWithPlayer = i
 			} else if (bumpAsteroids) {
 				for (otherIndex in i + 1 until asteroids.size) {
-					if (asteroid.shouldBump(asteroids[otherIndex])) {
+					if (asteroid.shouldBump(now, asteroids[otherIndex])) {
 						asteroid.bump(asteroids[otherIndex])
 					}
 				}
