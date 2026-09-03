@@ -27,7 +27,7 @@ abstract class AsteroidType {
 		verticesMin: Int,
 		verticesMax: Int
 	): List<DrawCommand> {
-		val patchCount = (Math.random() * (max - min) + min).toInt()
+		val patchCount = (Math.random() * (max - min + 1) + min).toInt()
 
 		val drawCommands = mutableListOf<DrawCommand>()
 
