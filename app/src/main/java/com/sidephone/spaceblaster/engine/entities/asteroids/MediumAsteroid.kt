@@ -6,7 +6,6 @@ class MediumAsteroid : AsteroidType() {
 	companion object {
 		const val RADIUS = 22f
 		const val SPEED = 75f // px/sec
-		const val TURN_SPEED = 45f // degrees/sec
 		const val MASS = RADIUS * RADIUS
 
 		const val SURFACE_COLOR = 0xFFAAAAAA.toInt()
@@ -14,35 +13,44 @@ class MediumAsteroid : AsteroidType() {
 		const val POINTS = 2
 	}
 
-	override fun mass(): Float {
-		return MASS
+	object Patch {
+		const val MIN = 2
+		const val MAX = 7
+		const val COLOR_MIN = 0x7C // will result in: 0xff7c7c7c
+		const val COLOR_MAX = 0x88 // will result in: 0xff888888
+		const val RADIUS_MIN = RADIUS * 0.1f
+		const val RADIUS_MAX = RADIUS * 0.35f
+		const val VERTICES_MIN = 4
+		const val VERTICES_MAX = 6
 	}
 
-	override fun radius(): Float {
-		return RADIUS
-	}
+	private val turnSpeed = (90 - 60 * Math.random()).toFloat() * (if (Math.random() < 0.5) 1f else -1f) // degrees/sec
+	private var drawCommands: List<DrawCommand> = emptyList()
 
-	override fun speed(): Float {
-		return SPEED
-	}
 
-	override fun turnSpeed(): Float {
-		return TURN_SPEED
-	}
+	override fun mass() = MASS
+	override fun radius() = RADIUS
+	override fun speed() = SPEED
+	override fun turnSpeed() = turnSpeed
 
-	override fun turnsLeft(): Boolean {
-		return true
-	}
 
 	override fun draw(): List<DrawCommand> {
-		return listOf(
-			DrawCommand.Circle(
-				0f,
-				0f,
-				RADIUS,
-				SURFACE_COLOR,
-				true
-			),
-		)
+		if (drawCommands.isEmpty()) {
+			drawCommands = listOf(
+				drawMainSurface(RADIUS, SURFACE_COLOR)) +
+				drawPatches(
+					Patch.MIN,
+					Patch.MAX,
+					Patch.COLOR_MIN,
+					Patch.COLOR_MAX,
+					RADIUS,
+					Patch.RADIUS_MIN,
+					Patch.RADIUS_MAX,
+					Patch.VERTICES_MIN,
+					Patch.VERTICES_MAX
+				)
+		}
+
+		return drawCommands
 	}
 }

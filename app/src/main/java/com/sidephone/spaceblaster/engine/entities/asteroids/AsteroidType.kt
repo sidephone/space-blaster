@@ -8,15 +8,51 @@ abstract class AsteroidType {
 	abstract fun radius(): Float
 	abstract fun speed(): Float
 	abstract fun turnSpeed(): Float
-	abstract fun turnsLeft(): Boolean
 	abstract fun draw(): List<DrawCommand>
 
 
 	protected fun drawMainSurface(radius: Float, color: Int): DrawCommand {
-		return DrawCommand.randomPolygon(0f, 0f, radius, ceil(radius / 3).toInt(), 0f, color, true)
+		return DrawCommand.randomPolygon(0f, 0f, radius, ceil(radius / 3).toInt().coerceAtLeast(5), 0f, color, true)
 	}
 
-	protected fun drawPatch(cx: Float, cy: Float, radius: Float, rotateDeg: Float, vertexCount: Int, color: Int, filled: Boolean): DrawCommand {
-		return DrawCommand.randomPolygon(cx, cy, radius, vertexCount, rotateDeg, color, filled)
+
+	protected fun drawPatches(
+		min: Int,
+		max: Int,
+		colorMin: Int,
+		colorMax: Int,
+		surfaceRadius: Float,
+		radiusMin: Float,
+		radiusMax: Float,
+		verticesMin: Int,
+		verticesMax: Int
+	): List<DrawCommand> {
+		val patchCount = (Math.random() * (max - min) + min).toInt()
+
+		val drawCommands = mutableListOf<DrawCommand>()
+
+		repeat(patchCount) {
+			val radius = (Math.random() * (radiusMax - radiusMin) + radiusMin).toFloat()
+			val cx = (surfaceRadius - radius * 1.6f) * Math.random() * (if (Math.random() < 0.5) -1 else 1)
+			val cy = (surfaceRadius - radius * 1.6f) * Math.random() * (if (Math.random() < 0.5) -1 else 1)
+
+			val colorIndex = (colorMin + Math.random() * (colorMax - colorMin)).toInt()
+			val color = (0xFF shl 24) or (colorIndex shl 16) or (colorIndex shl 8) or colorIndex
+
+			drawCommands.add(drawPatch(
+				cx = cx.toFloat(),
+				cy = cy.toFloat(),
+				radius = radius,
+				vertexCount = (Math.random() * (verticesMax - verticesMin) + verticesMin).toInt(),
+				rotateDeg = (Math.random() * 360).toFloat(),
+				color = color
+			))
+		}
+
+		return drawCommands
+	}
+
+	private fun drawPatch(cx: Float, cy: Float, radius: Float, rotateDeg: Float, vertexCount: Int, color: Int): DrawCommand {
+		return DrawCommand.randomPolygon(cx, cy, radius, vertexCount, rotateDeg, color, true)
 	}
 }

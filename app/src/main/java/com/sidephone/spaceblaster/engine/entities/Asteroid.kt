@@ -141,13 +141,25 @@ class Asteroid : SpaceObject {
 
 	fun move(now: Long, viewportWidth: Float, viewportHeight: Float) {
 		val dt = ((now - lastMoveTime) / 1000f).coerceAtMost(moveDtMax)
-		val turnDirection = if (asteroidType.turnsLeft()) 1f else -1f
-		var turnSpeed = turnDirection * (asteroidType.turnSpeed() * (now - lastMoveTime) / 1000f)
-		turnSpeed = turnSpeed.coerceAtMost(turnStepMax).coerceAtLeast(-turnStepMax)
+		var turnSpeed = (asteroidType.turnSpeed() * (now - lastMoveTime) / 1000f)
+
+		turnSpeed = if (turnSpeed > 0) {
+			if (turnStepMax > 0) {
+				turnSpeed.coerceAtMost(turnStepMax)
+			} else {
+				turnSpeed.coerceAtMost(-turnStepMax)
+			}
+		} else {
+			if (turnStepMax > 0) {
+				turnSpeed.coerceAtLeast(-turnStepMax)
+			} else {
+				turnSpeed.coerceAtLeast(turnStepMax)
+			}
+		}
+
 		direction += turnSpeed
 		x += speedX * dt
 		y += speedY * dt
-
 
 		// wrap around the screen edges
 		if (x < 0) x = viewportWidth

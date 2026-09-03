@@ -6,7 +6,6 @@ class LargeAsteroid : AsteroidType() {
 	companion object {
 		const val RADIUS = 35f
 		const val SPEED = 50f // px/sec
-		const val TURN_SPEED = 30f // degrees/sec
 		const val MASS = RADIUS * RADIUS
 
 		const val SURFACE_COLOR = 0xFF888888.toInt()
@@ -14,61 +13,44 @@ class LargeAsteroid : AsteroidType() {
 		const val POINTS = 1
 	}
 
+
+
+	object Patch {
+		const val MIN = 3
+		const val MAX = 7
+		const val COLOR_MIN = 0x60 // will result in: 0xff606060
+		const val COLOR_MAX = 0x70 // will result in: 0xff707070
+		const val RADIUS_MIN = RADIUS * 0.1f
+		const val RADIUS_MAX = RADIUS * 0.4f
+		const val VERTICES_MIN = 5
+		const val VERTICES_MAX = 7
+	}
+
+	private val turnSpeed = (15 - 30 * Math.random()).toFloat() // degrees/secc
 	private var drawCommands: List<DrawCommand> = emptyList()
 
-	override fun mass(): Float {
-		return MASS
-	}
 
-	override fun radius(): Float {
-		return RADIUS
-	}
+	override fun mass() = MASS
+	override fun radius() = RADIUS
+	override fun speed() = SPEED
+	override fun turnSpeed() = turnSpeed
 
-	override fun speed(): Float {
-		return SPEED
-	}
-
-	override fun turnSpeed(): Float {
-		return TURN_SPEED
-	}
-
-	override fun turnsLeft(): Boolean {
-		return true
-	}
 
 	override fun draw(): List<DrawCommand> {
 		if (drawCommands.isEmpty()) {
 			drawCommands = listOf(
-				drawMainSurface(RADIUS, SURFACE_COLOR),
-				drawPatch(
-					cx = -RADIUS * 0.30f,
-					cy = -RADIUS * 0.25f,
-					radius = RADIUS * 0.22f,
-					vertexCount = 5,
-					rotateDeg = -8f,
-					color = 0xFF626262.toInt(),
-					filled = true
-				),
-
-				drawPatch(
-					cx = RADIUS * 0.28f,
-					cy = -RADIUS * 0.10f,
-					radius = RADIUS * 0.18f,
-					vertexCount = 6,
-					rotateDeg = 12f,
-					color = 0xFF666666.toInt(),
-					filled = true
-				),
-				drawPatch(
-					cx = RADIUS * 0.05f,
-					cy = RADIUS * 0.32f,
-					radius = RADIUS * 0.35f,
-					vertexCount = 6,
-					rotateDeg = -5f,
-					color = 0xFF5C5C5C.toInt(),
-					filled = true
-				),
-			)
+				drawMainSurface(RADIUS, SURFACE_COLOR)) +
+				drawPatches(
+					Patch.MIN,
+					Patch.MAX,
+					Patch.COLOR_MIN,
+					Patch.COLOR_MAX,
+					RADIUS,
+					Patch.RADIUS_MIN,
+					Patch.RADIUS_MAX,
+					Patch.VERTICES_MIN,
+					Patch.VERTICES_MAX
+				)
 		}
 
 		return drawCommands
