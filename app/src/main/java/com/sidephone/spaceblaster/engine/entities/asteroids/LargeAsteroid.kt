@@ -26,7 +26,7 @@ class LargeAsteroid : AsteroidType() {
 		const val VERTICES_MAX = 7
 	}
 
-	private val turnSpeed = (15 - 30 * Math.random()).toFloat() // degrees/secc
+	private val turnSpeed = (15 - 30 * Math.random()).toFloat() // degrees/sec
 	private var drawCommands: List<DrawCommand> = emptyList()
 
 
