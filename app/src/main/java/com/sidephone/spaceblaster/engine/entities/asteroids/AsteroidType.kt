@@ -32,7 +32,7 @@ abstract class AsteroidType {
 		val drawCommands = mutableListOf<DrawCommand>()
 
 		repeat(patchCount) {
-			val radius = (Math.random() * (radiusMax - radiusMin + 1) + radiusMin).toFloat()
+			val radius = (Math.random() * (radiusMax - radiusMin) + radiusMin).toFloat()
 			val cx = (surfaceRadius - radius * 1.6f) * Math.random() * (if (Math.random() < 0.5) -1 else 1)
 			val cy = (surfaceRadius - radius * 1.6f) * Math.random() * (if (Math.random() < 0.5) -1 else 1)
 
