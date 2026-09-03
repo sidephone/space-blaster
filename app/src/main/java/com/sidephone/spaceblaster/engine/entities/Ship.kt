@@ -47,6 +47,11 @@ class Ship : SpaceObject {
 	fun speedDirection(): Float = Math.toDegrees(atan2(speedY.toDouble(), speedX.toDouble())).toFloat()
 
 
+	fun die() {
+		if (lives-- <= 0) return
+	}
+
+
 	fun spawn(now: Long, viewportWidth: Float, viewportHeight: Float) {
 		if (lives <= 0) return
 
@@ -69,8 +74,6 @@ class Ship : SpaceObject {
 		isThrusting = false
 		isInvincible = true
 		invincibilityTimeout = now + INVINCIBILITY_DURATION
-
-		lives--
 	}
 
 

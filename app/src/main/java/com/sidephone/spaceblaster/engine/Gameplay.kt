@@ -64,6 +64,7 @@ class Gameplay(private val settings: Settings?) {
 
 		space.bigBang(viewportWidth, viewportHeight)
 		player.spawn(System.currentTimeMillis(), viewportWidth, viewportHeight)
+		player.resetLives()
 		asteroids.spawn(settings, stage, player, viewportWidth, viewportHeight)
 
 		if (!isGameThreadAlive()) {
@@ -117,7 +118,6 @@ class Gameplay(private val settings: Settings?) {
 
 		isPaused = false
 		pressedKeys = emptySet()
-		player.resetLives()
 
 		engineLooper = executor.scheduleWithFixedDelay(
 			{ advance() },
@@ -279,6 +279,7 @@ class Gameplay(private val settings: Settings?) {
 		asteroids.move(now, player, viewportWidth, viewportHeight)
 		val asteroidIndex = asteroids.oneBumpsWithPlayer()
 		if (asteroidIndex >= 0) {
+			player.die()
 			asteroids.split(asteroidIndex, player, viewportWidth, viewportHeight)
 			player.spawn(now, viewportWidth, viewportHeight)
 		}
