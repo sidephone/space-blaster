@@ -48,7 +48,8 @@ class Ship : SpaceObject {
 
 
 	fun die() {
-		if (lives-- <= 0) return
+		if (lives <= 0) return
+		lives--
 	}
 
 

@@ -63,8 +63,8 @@ class Gameplay(private val settings: Settings?) {
 		stage = 1
 
 		space.bigBang(viewportWidth, viewportHeight)
-		player.spawn(System.currentTimeMillis(), viewportWidth, viewportHeight)
 		player.resetLives()
+		player.spawn(System.currentTimeMillis(), viewportWidth, viewportHeight)
 		asteroids.spawn(settings, stage, player, viewportWidth, viewportHeight)
 
 		if (!isGameThreadAlive()) {
