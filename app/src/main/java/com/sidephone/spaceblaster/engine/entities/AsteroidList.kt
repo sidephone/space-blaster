@@ -30,7 +30,7 @@ class AsteroidList {
 
 		asteroids.clear()
 
-		for (i in 1 until MIN_ASTEROIDS + stage) {
+		repeat(MIN_ASTEROIDS + stage - 1) {
 			asteroids.add(Asteroid().spawn(
 				Asteroid.SIZE.LARGE,
 				null,
@@ -74,8 +74,8 @@ class AsteroidList {
 			return
 		}
 
-		for (i in 1..2) {
-			val newDirection = player.speedDirection() + (15f - 30f * Math.random().toFloat())
+		repeat(2) {
+			val newDirection = player.speedDirection() + (30f - 60f * Math.random().toFloat())
 
 			asteroids.add(Asteroid().spawn(
 				newType,
