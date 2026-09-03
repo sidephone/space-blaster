@@ -4,7 +4,7 @@ import android.content.SharedPreferences
 
 class Settings(context: android.content.Context) {
 	companion object {
-		private const val PREFS_NAME = "SnakeSettings"
+		private const val PREFS_NAME = "SpaceBlasterSettings"
 		private const val ASTEROIDS_BUMP_KEY = "asteroids_bump"
 	}
 
