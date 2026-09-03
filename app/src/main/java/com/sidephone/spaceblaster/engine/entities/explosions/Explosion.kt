@@ -7,12 +7,9 @@ import kotlin.math.log
 import kotlin.math.sin
 
 abstract class Explosion(private val startTime: Long, private val position: Pair<Float, Float>) {
-	companion object {
-		const val COLOR = 0x00FFFF60 // alpha is applied depending on the distance from the center
-	}
-
 	private val particles = getParticles()
 
+	abstract fun color(): Int
 	abstract fun duration(): Long
 	abstract fun getParticles(): List<ExplosionParticle>
 
@@ -47,7 +44,7 @@ abstract class Explosion(private val startTime: Long, private val position: Pair
 		}
 
 		val alpha = 255 * (1 - log(elapsedTime.toDouble(), 1000.0) / log(duration().toDouble(), 1000.0))
-		val colorWithAlpha = (alpha.toInt() shl 24) or (COLOR and 0x00FFFFFF)
+		val colorWithAlpha = (alpha.toInt() shl 24) or (color() and 0x00FFFFFF)
 
 		val drawCommands = particles.map { p ->
 			DrawCommand.Circle(

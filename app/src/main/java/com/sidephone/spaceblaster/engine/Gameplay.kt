@@ -8,6 +8,7 @@ import androidx.annotation.WorkerThread
 import com.sidephone.spaceblaster.engine.entities.AsteroidList
 import com.sidephone.spaceblaster.engine.entities.Ship
 import com.sidephone.spaceblaster.engine.entities.Space
+import com.sidephone.spaceblaster.engine.entities.explosions.AsteroidExplosion
 import com.sidephone.spaceblaster.engine.entities.explosions.Explosion
 import com.sidephone.spaceblaster.engine.entities.explosions.NullExplosion
 import com.sidephone.spaceblaster.engine.entities.explosions.ShipExplosion
@@ -46,10 +47,11 @@ class Gameplay(private val settings: Settings?) {
 	@Volatile var currentFrame: GameFrame = GameFrame()
 
 	// game objects
-	private val player = Ship()
-	private val space = Space()
 	private var asteroids = AsteroidList()
+	private var asteroidExplosion: Explosion = NullExplosion()
+	private val player = Ship()
 	private var playerExplosion: Explosion = NullExplosion()
+	private val space = Space()
 
 	// game state
 	private var stage = 1
@@ -282,11 +284,15 @@ class Gameplay(private val settings: Settings?) {
 		player.move(now, viewportWidth, viewportHeight)
 		playerExplosion.spread(now)
 
+		asteroidExplosion.spread(now)
 		asteroids.move(now, player, viewportWidth, viewportHeight)
+
 		val asteroidIndex = asteroids.oneBumpsWithPlayer()
 		if (asteroidIndex >= 0) {
 			player.die(now)
 			playerExplosion = ShipExplosion(now, player.position())
+
+			asteroidExplosion = AsteroidExplosion(now, asteroids.position(asteroidIndex))
 			asteroids.split(asteroidIndex, player, viewportWidth, viewportHeight)
 		}
 
@@ -294,6 +300,7 @@ class Gameplay(private val settings: Settings?) {
 		screenObjects.add(space.draw(now))
 		screenObjects.addAll(asteroids.draw(now))
 		screenObjects.add(player.draw(now))
+		screenObjects.add(asteroidExplosion.draw(now))
 		screenObjects.add(playerExplosion.draw(now))
 
 		currentFrame = GameFrame(Space.BACKGROUND, screenObjects)
