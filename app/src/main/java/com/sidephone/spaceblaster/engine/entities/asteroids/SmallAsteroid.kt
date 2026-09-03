@@ -2,7 +2,7 @@ package com.sidephone.spaceblaster.engine.entities.asteroids
 
 import com.sidephone.spaceblaster.engine.graphics.DrawCommand
 
-class SmallAsteroid : AsteroidType {
+class SmallAsteroid : AsteroidType() {
 	companion object {
 		const val RADIUS = 10f
 		const val SPEED = 100f // px/sec
