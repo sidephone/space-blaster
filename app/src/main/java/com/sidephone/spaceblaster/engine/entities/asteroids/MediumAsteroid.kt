@@ -21,7 +21,7 @@ class MediumAsteroid : AsteroidType() {
 		const val RADIUS_MIN = RADIUS * 0.1f
 		const val RADIUS_MAX = RADIUS * 0.35f
 		const val VERTICES_MIN = 4
-		const val VERTICES_MAX = 6
+		const val VERTICES_MAX = 5
 	}
 
 	private val turnSpeed = (90 - 60 * Math.random()).toFloat() * (if (Math.random() < 0.5) 1f else -1f) // degrees/sec

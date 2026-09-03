@@ -43,7 +43,7 @@ abstract class AsteroidType {
 				cx = cx.toFloat(),
 				cy = cy.toFloat(),
 				radius = radius,
-				vertexCount = (Math.random() * (verticesMax - verticesMin) + verticesMin).toInt(),
+				vertexCount = (Math.random() * (verticesMax - verticesMin + 1) + verticesMin).toInt(),
 				rotateDeg = (Math.random() * 360).toFloat(),
 				color = color
 			))

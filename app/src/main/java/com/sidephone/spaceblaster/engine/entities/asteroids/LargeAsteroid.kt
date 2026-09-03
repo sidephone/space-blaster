@@ -23,7 +23,7 @@ class LargeAsteroid : AsteroidType() {
 		const val RADIUS_MIN = RADIUS * 0.1f
 		const val RADIUS_MAX = RADIUS * 0.4f
 		const val VERTICES_MIN = 5
-		const val VERTICES_MAX = 7
+		const val VERTICES_MAX = 6
 	}
 
 	private val turnSpeed = (15 - 30 * Math.random()).toFloat() // degrees/sec

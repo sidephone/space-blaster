@@ -21,7 +21,7 @@ class SmallAsteroid : AsteroidType() {
 		const val RADIUS_MIN = RADIUS * 0.1f
 		const val RADIUS_MAX = RADIUS * 0.5f
 		const val VERTICES_MIN = 3
-		const val VERTICES_MAX = 5
+		const val VERTICES_MAX = 4
 	}
 
 	private val turnSpeed = (120 - 80 * Math.random()).toFloat() * (if (Math.random() < 0.5) 1f else -1f) // degrees/sec
