@@ -28,7 +28,7 @@ class Asteroid : SpaceObject {
 	private var lastMoveTime = 0L // ms
 
 
-	override fun notBumpable(): Boolean = false
+	override fun notBumpable(now: Long): Boolean = false
 	override fun position(): Pair<Float, Float> = Pair(x, y)
 	override fun radius(): Float = asteroidType.radius()
 	override fun speed(): Pair<Float, Float> = Pair(speedX, speedY)
@@ -81,8 +81,8 @@ class Asteroid : SpaceObject {
 	 * Checks whether this asteroid and the other object are close enough to collide(distance between
 	 * centers <= sum of radii) AND are currently approaching each other
 	 */
-	fun shouldBump(other: SpaceObject): Boolean {
-		if (other.notBumpable()) return false
+	fun shouldBump(now: Long, other: SpaceObject): Boolean {
+		if (other.notBumpable(now)) return false
 
 		val dx = other.position().first - x
 		val dy = other.position().second - y

@@ -12,8 +12,9 @@ import kotlin.math.sqrt
 
 class Ship : SpaceObject {
 	companion object {
-		const val STARTING_LIVES = 3
 		const val INVINCIBILITY_DURATION = 2000L // ms
+		const val RESPAWN_DELAY = 1500L // ms
+		const val STARTING_LIVES = 3
 	}
 
 	private var shipType: ShipType = DefenderShip()
@@ -28,6 +29,7 @@ class Ship : SpaceObject {
 	private var moveDtMax: Float = 1f
 	private var turnStepMax: Float = 1f
 
+	private var lastDeathTime = 0L
 	private var lastThrustTime = 0L // ms
 	private var lastMoveTime = 0L // ms
 	private var lastTurnTime = 0L // ms
@@ -39,22 +41,63 @@ class Ship : SpaceObject {
 	private var lives = STARTING_LIVES
 
 
-	override fun notBumpable(): Boolean = lives <= 0 || isInvincible
+	override fun notBumpable(now: Long): Boolean = isDead(now) || isInvincible
 	override fun position(): Pair<Float, Float> = Pair(x, y)
 	override fun radius(): Float = shipType.radius()
 	override fun speed(): Pair<Float, Float> = Pair(speedX, speedY)
+
+	fun isDead(now: Long) = lives <= 0 || (lastDeathTime + RESPAWN_DELAY > now)
 	fun minAsteroidSpawnDistance(): Float = shipType.radius() * 3f
 	fun speedDirection(): Float = Math.toDegrees(atan2(speedY.toDouble(), speedX.toDouble())).toFloat()
 
 
-	fun die() {
-		if (lives <= 0) return
+	fun autoSpawnAfterDeath(now: Long, viewportWidth: Float, viewportHeight: Float) {
+		if (lives <= 0 || lastDeathTime == 0L) return
+
+		if (now - lastDeathTime >= RESPAWN_DELAY) {
+			spawn(now, viewportWidth, viewportHeight)
+		}
+	}
+
+
+	fun die(now: Long) {
+		if (isDead(now)) return
 		lives--
+		lastDeathTime = now
+	}
+
+
+	/**
+	 * Use the current ship speed to calculate the new position of the ship based on the elapsed time
+	 * since the last move. Movement could occur after calling thrust(), but also when the ship is
+	 * coasting in space.
+	 */
+	fun move(now: Long, viewportWidth: Float, viewportHeight: Float) {
+		if (isDead(now)) return
+
+		val dt = ((now - lastMoveTime) / 1000f).coerceAtMost(moveDtMax)
+		lastMoveTime = now
+
+		x += speedX * dt
+		y += speedY * dt
+
+		// wrap around the screen edges
+		if (x < 0) x = viewportWidth
+		if (y < 0) y = viewportHeight
+		if (x > viewportWidth) x = 0f
+		if (y > viewportHeight) y = 0f
+	}
+
+
+	fun revokeInvincibilityWhenExpired(now: Long) {
+		if (now >= invincibilityTimeout) {
+			isInvincible = false
+		}
 	}
 
 
 	fun spawn(now: Long, viewportWidth: Float, viewportHeight: Float) {
-		if (lives <= 0) return
+		if (isDead(now)) return
 
 		shipType = DefenderShip()
 
@@ -75,6 +118,7 @@ class Ship : SpaceObject {
 		isThrusting = false
 		isInvincible = true
 		invincibilityTimeout = now + INVINCIBILITY_DURATION
+		lastDeathTime = 0L
 	}
 
 
@@ -84,40 +128,11 @@ class Ship : SpaceObject {
 
 
 	/**
-	 * Calculate the new speed of the ship based on its acceleration and direction. This does NOT
-	 * change the position of the ship, that is done in move().
-	 */
-	fun thrust(now: Long, thrusting: Boolean) {
-		if (lives <= 0) return
-
-		isThrusting = thrusting
-		if (!isThrusting) return
-
-		val dt = (now - lastThrustTime) / 1000f
-		lastThrustTime = now
-
-		val angle = Math.toRadians(direction.toDouble())
-		val acceleration = shipType.acceleration()
-		val moveSpeed = (acceleration * dt).coerceAtMost(accelerationMax)
-
-		speedX += (moveSpeed * cos(angle).toFloat())
-		speedY += (moveSpeed * sin(angle).toFloat())
-
-		val speed = sqrt(speedX * speedX + speedY * speedY)
-		if (speed > shipType.maxSpeed()) {
-			val scale = shipType.maxSpeed() / speed
-			speedX *= scale
-			speedY *= scale
-		}
-	}
-
-
-	/**
 	 * Calculate the new speed of the ship based on its braking power. This does NOT change the
 	 * position of the ship, that is done in move().
 	 */
 	fun stop(now: Long) {
-		if (lives <= 0) return
+		if (isDead(now)) return
 
 		isThrusting = false
 
@@ -143,10 +158,39 @@ class Ship : SpaceObject {
 
 
 	/**
+	 * Calculate the new speed of the ship based on its acceleration and direction. This does NOT
+	 * change the position of the ship, that is done in move().
+	 */
+	fun thrust(now: Long, thrusting: Boolean) {
+		if (isDead(now)) return
+
+		isThrusting = thrusting
+		if (!isThrusting) return
+
+		val dt = (now - lastThrustTime) / 1000f
+		lastThrustTime = now
+
+		val angle = Math.toRadians(direction.toDouble())
+		val acceleration = shipType.acceleration()
+		val moveSpeed = (acceleration * dt).coerceAtMost(accelerationMax)
+
+		speedX += (moveSpeed * cos(angle).toFloat())
+		speedY += (moveSpeed * sin(angle).toFloat())
+
+		val speed = sqrt(speedX * speedX + speedY * speedY)
+		if (speed > shipType.maxSpeed()) {
+			val scale = shipType.maxSpeed() / speed
+			speedX *= scale
+			speedY *= scale
+		}
+	}
+
+
+	/**
 	 * Change the ship orientation
 	 */
 	fun turn(now: Long, left: Boolean) {
-		if (lives <= 0) return
+		if (isDead(now)) return
 
 		val turnSpeed = (shipType.turnSpeed() * (now - lastTurnTime) / 1000f).coerceAtMost(turnStepMax)
 		lastTurnTime = now
@@ -155,37 +199,8 @@ class Ship : SpaceObject {
 	}
 
 
-	/**
-	 * Use the current ship speed to calculate the new position of the ship based on the elapsed time
-	 * since the last move. Movement could occur after calling thrust(), but also when the ship is
-	 * coasting in space.
-	 */
-	fun move(now: Long, viewportWidth: Float, viewportHeight: Float) {
-		if (lives <= 0) return
-
-		val dt = ((now - lastMoveTime) / 1000f).coerceAtMost(moveDtMax)
-		lastMoveTime = now
-
-		x += speedX * dt
-		y += speedY * dt
-
-		// wrap around the screen edges
-		if (x < 0) x = viewportWidth
-		if (y < 0) y = viewportHeight
-		if (x > viewportWidth) x = 0f
-		if (y > viewportHeight) y = 0f
-	}
-
-
-	fun revokeInvincibilityWhenExpired(now: Long) {
-		if (now >= invincibilityTimeout) {
-			isInvincible = false
-		}
-	}
-
-
 	fun draw(now: Long): DrawCommandGroup {
-		if (lives <= 0) {
+		if (isDead(now)) {
 			return DrawCommandGroup(0f, 0f, 0f, emptyList())
 		}
 
