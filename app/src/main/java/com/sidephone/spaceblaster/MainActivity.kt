@@ -28,7 +28,7 @@ import com.sidephone.spaceblaster.ui.theme.GameTheme
 
 class MainActivity : ComponentActivity() {
 	private var gamepad = Gamepad()
-	private var gameplay: Gameplay = Gameplay(null)
+	private lateinit var gameplay: Gameplay
 
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
