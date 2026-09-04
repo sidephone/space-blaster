@@ -2,7 +2,7 @@ package com.sidephone.spaceblaster.engine.entities.explosions
 
 class AsteroidExplosion(startTime: Long, position: Pair<Float, Float>) : Explosion(startTime, position) {
 	companion object {
-		const val COLOR = 0x009A9A9A // alpha is applied depending on the distance from the center
+		const val COLOR = 0x009A9A9A // alpha is applied depending on elapsed time
 		const val DURATION = 800L // ms
 		const val PARTICLE_COUNT = 35
 		const val PARTICLE_SIZE = 10f
