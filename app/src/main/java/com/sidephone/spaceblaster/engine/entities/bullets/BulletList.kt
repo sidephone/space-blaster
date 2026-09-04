@@ -15,10 +15,7 @@ abstract class BulletList {
 
 
 	fun draw(): List<DrawCommandGroup> {
-		return if (bullets.all { it.isIdle() })
-			emptyList()
-		else
-			bullets.map { it.draw() }
+		return bullets.filterNot { it.isIdle() }.map { it.draw() }
 	}
 
 
