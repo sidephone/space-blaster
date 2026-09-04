@@ -14,7 +14,7 @@ class AsteroidExplosion(startTime: Long, position: Pair<Float, Float>?) : Explos
 	override fun duration() = DURATION
 
 	override fun getParticles(): List<ExplosionParticle> {
-		val particles = mutableListOf<ExplosionParticle>()
+		val particles = ArrayList<ExplosionParticle>(PARTICLE_COUNT)
 
 		repeat(PARTICLE_COUNT) {
 			particles.add(
