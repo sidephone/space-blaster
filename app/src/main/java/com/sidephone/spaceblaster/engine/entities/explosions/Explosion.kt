@@ -15,13 +15,13 @@ abstract class Explosion(private val startTime: Long, private val position: Pair
 
 
 	fun spread(now: Long) {
-		if (particles.isEmpty()) {
-			particles = getParticles()
+		val elapsedTime = now - startTime
+		if (position == null || elapsedTime > duration()) {
+			return
 		}
 
-		val elapsedTime = now - startTime
-		if (elapsedTime > duration()) {
-			return
+		if (particles.isEmpty()) {
+			particles = getParticles()
 		}
 
 		for (particle in particles) {
