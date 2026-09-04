@@ -214,10 +214,10 @@ class Ship : SpaceObject {
 		val blink = (isInvincible && (now % 200L < 100L))
 
 		return DrawCommandGroup(
-            x,
-            y,
-            direction - shipType.drawDirection(),
-            if (blink) emptyList() else shipType.draw(now, isThrusting)
-        )
+			x,
+			y,
+			direction - shipType.drawDirection(),
+			if (blink) emptyList() else shipType.draw(now, isThrusting)
+		)
 	}
 }

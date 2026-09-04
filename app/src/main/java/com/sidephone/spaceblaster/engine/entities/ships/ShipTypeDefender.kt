@@ -5,10 +5,10 @@ import kotlin.math.abs
 
 class ShipTypeDefender : ShipType {
 	companion object {
-		const val ACCELERATION = 225f // px/sec^2
+		const val ACCELERATION = 325f // px/sec^2
 		const val BRAKING = ACCELERATION * 0.75f // px/sec^2
-		const val MAX_SPEED = 225f // px/sec
-		const val TURN_SPEED = 225f // degrees/sec
+		const val MAX_SPEED = 175f // px/sec
+		const val TURN_SPEED = 250f // degrees/sec
 
 		const val DRAW_DIRECTION = -90f // degrees, 0 is to the right, -90 is straight up
 		const val RADIUS = 25f
