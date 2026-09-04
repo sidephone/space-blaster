@@ -1,14 +1,12 @@
-package com.sidephone.spaceblaster.engine.entities
+package com.sidephone.spaceblaster.engine.entities.ships
 
-import com.sidephone.spaceblaster.engine.entities.ships.DefenderShip
-import com.sidephone.spaceblaster.engine.entities.ships.ShipType
+import com.sidephone.spaceblaster.engine.entities.SpaceObject
 import com.sidephone.spaceblaster.engine.graphics.DrawCommandGroup
 import com.sidephone.spaceblaster.settings.Settings
 import kotlin.math.atan2
 import kotlin.math.cos
 import kotlin.math.sin
 import kotlin.math.sqrt
-
 
 class Ship : SpaceObject {
 	companion object {
@@ -17,7 +15,7 @@ class Ship : SpaceObject {
 		const val STARTING_LIVES = 3
 	}
 
-	private var shipType: ShipType = DefenderShip()
+	private var shipType: ShipType = ShipTypeDefender()
 
 	private var direction: Float = 0f // degrees, 0 is to the right, -90 is straight up
 	private var x: Float = 0f // px, center of the ship
@@ -99,7 +97,7 @@ class Ship : SpaceObject {
 	fun spawn(now: Long, viewportWidth: Float, viewportHeight: Float) {
 		if (lives <= 0) return
 
-		shipType = DefenderShip()
+		shipType = ShipTypeDefender()
 
 		direction = shipType.drawDirection()
 		x = viewportWidth / 2f
@@ -207,10 +205,10 @@ class Ship : SpaceObject {
 		val blink = (isInvincible && (now % 200L < 100L))
 
 		return DrawCommandGroup(
-			x,
-			y,
-			direction - shipType.drawDirection(),
-			if (blink) emptyList() else shipType.draw(now, isThrusting)
-		)
+            x,
+            y,
+            direction - shipType.drawDirection(),
+            if (blink) emptyList() else shipType.draw(now, isThrusting)
+        )
 	}
 }

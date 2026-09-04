@@ -5,13 +5,13 @@ import android.view.KeyEvent
 import androidx.annotation.AnyThread
 import androidx.annotation.MainThread
 import androidx.annotation.WorkerThread
-import com.sidephone.spaceblaster.engine.entities.AsteroidList
-import com.sidephone.spaceblaster.engine.entities.Ship
 import com.sidephone.spaceblaster.engine.entities.Space
-import com.sidephone.spaceblaster.engine.entities.explosions.AsteroidExplosion
+import com.sidephone.spaceblaster.engine.entities.asteroids.AsteroidList
 import com.sidephone.spaceblaster.engine.entities.explosions.Explosion
-import com.sidephone.spaceblaster.engine.entities.explosions.NullExplosion
-import com.sidephone.spaceblaster.engine.entities.explosions.ShipExplosion
+import com.sidephone.spaceblaster.engine.entities.explosions.ExplosionTypeAsteroid
+import com.sidephone.spaceblaster.engine.entities.explosions.ExplosionTypeNull
+import com.sidephone.spaceblaster.engine.entities.explosions.ExplosionTypeShip
+import com.sidephone.spaceblaster.engine.entities.ships.Ship
 import com.sidephone.spaceblaster.engine.graphics.DrawCommandGroup
 import com.sidephone.spaceblaster.engine.graphics.GameFrame
 import com.sidephone.spaceblaster.settings.Settings
@@ -48,9 +48,9 @@ class Gameplay(private val settings: Settings?) {
 
 	// game objects
 	private var asteroids = AsteroidList()
-	private var asteroidExplosion: Explosion = NullExplosion()
+	private var asteroidExplosion: Explosion = ExplosionTypeNull()
 	private val player = Ship()
-	private var playerExplosion: Explosion = NullExplosion()
+	private var playerExplosion: Explosion = ExplosionTypeNull()
 	private val space = Space()
 
 	// game state
@@ -290,9 +290,9 @@ class Gameplay(private val settings: Settings?) {
 		val asteroidIndex = asteroids.oneBumpsWithPlayer()
 		if (asteroidIndex >= 0) {
 			player.die(now)
-			playerExplosion = ShipExplosion(now, player.position())
+			playerExplosion = ExplosionTypeShip(now, player.position())
 
-			asteroidExplosion = AsteroidExplosion(now, asteroids.position(asteroidIndex))
+			asteroidExplosion = ExplosionTypeAsteroid(now, asteroids.position(asteroidIndex))
 			asteroids.split(asteroidIndex, player, viewportWidth, viewportHeight)
 		}
 

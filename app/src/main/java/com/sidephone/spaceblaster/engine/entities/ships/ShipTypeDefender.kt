@@ -2,7 +2,7 @@ package com.sidephone.spaceblaster.engine.entities.ships
 
 import com.sidephone.spaceblaster.engine.graphics.DrawCommand
 
-class DefenderShip : ShipType {
+class ShipTypeDefender : ShipType {
 	companion object {
 		const val ACCELERATION = 225f // px/sec^2
 		const val BRAKING = ACCELERATION * 0.75f // px/sec^2

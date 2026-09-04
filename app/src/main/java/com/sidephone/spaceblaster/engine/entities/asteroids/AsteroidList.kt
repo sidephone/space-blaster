@@ -1,5 +1,6 @@
-package com.sidephone.spaceblaster.engine.entities
+package com.sidephone.spaceblaster.engine.entities.asteroids
 
+import com.sidephone.spaceblaster.engine.entities.ships.Ship
 import com.sidephone.spaceblaster.engine.graphics.DrawCommandGroup
 import com.sidephone.spaceblaster.settings.Settings
 

@@ -2,29 +2,29 @@ package com.sidephone.spaceblaster.engine.entities.asteroids
 
 import com.sidephone.spaceblaster.engine.graphics.DrawCommand
 
-class MediumAsteroid : AsteroidType() {
+class AsteroidTypeSmall : AsteroidType() {
 	companion object {
-		const val RADIUS = 22f
-		const val SPEED = 75f // px/sec
+		const val RADIUS = 12f
+		const val SPEED = 100f // px/sec
 		const val MASS = RADIUS * RADIUS
 
-		const val SURFACE_COLOR = 0xFFAAAAAA.toInt()
+		const val SURFACE_COLOR = 0xFFCCCCCC.toInt()
 
-		const val POINTS = 2
+		const val POINTS = 4
 	}
 
 	object Patch {
-		const val MIN = 2
-		const val MAX = 6
-		const val COLOR_MIN = 0x7C // will result in: 0xff7c7c7c
-		const val COLOR_MAX = 0x88 // will result in: 0xff888888
+		const val MIN = 0
+		const val MAX = 2
+		const val COLOR_MIN = 0xA0
+		const val COLOR_MAX = 0xB8
 		const val RADIUS_MIN = RADIUS * 0.1f
-		const val RADIUS_MAX = RADIUS * 0.35f
-		const val VERTICES_MIN = 4
-		const val VERTICES_MAX = 5
+		const val RADIUS_MAX = RADIUS * 0.5f
+		const val VERTICES_MIN = 3
+		const val VERTICES_MAX = 4
 	}
 
-	private val turnSpeed = (90 - 60 * Math.random()).toFloat() * (if (Math.random() < 0.5) 1f else -1f) // degrees/sec
+	private val turnSpeed = (120 - 80 * Math.random()).toFloat() * (if (Math.random() < 0.5) 1f else -1f) // degrees/sec
 	private var drawCommands: List<DrawCommand> = emptyList()
 
 
@@ -36,9 +36,7 @@ class MediumAsteroid : AsteroidType() {
 
 	override fun draw(): List<DrawCommand> {
 		if (drawCommands.isEmpty()) {
-			drawCommands = listOf(
-				drawMainSurface(RADIUS, SURFACE_COLOR)) +
-				drawPatches(
+			drawCommands = listOf(drawMainSurface(RADIUS, SURFACE_COLOR)) + drawPatches(
 					Patch.MIN,
 					Patch.MAX,
 					Patch.COLOR_MIN,
@@ -48,7 +46,7 @@ class MediumAsteroid : AsteroidType() {
 					Patch.RADIUS_MAX,
 					Patch.VERTICES_MIN,
 					Patch.VERTICES_MAX
-				)
+			)
 		}
 
 		return drawCommands

@@ -1,9 +1,6 @@
-package com.sidephone.spaceblaster.engine.entities
+package com.sidephone.spaceblaster.engine.entities.asteroids
 
-import com.sidephone.spaceblaster.engine.entities.asteroids.AsteroidType
-import com.sidephone.spaceblaster.engine.entities.asteroids.LargeAsteroid
-import com.sidephone.spaceblaster.engine.entities.asteroids.MediumAsteroid
-import com.sidephone.spaceblaster.engine.entities.asteroids.SmallAsteroid
+import com.sidephone.spaceblaster.engine.entities.SpaceObject
 import com.sidephone.spaceblaster.engine.graphics.DrawCommandGroup
 import com.sidephone.spaceblaster.settings.Settings
 import kotlin.math.cos
@@ -15,7 +12,7 @@ class Asteroid : SpaceObject {
 		LARGE, MEDIUM, SMALL
 	}
 
-	private var asteroidType: AsteroidType = LargeAsteroid()
+	private var asteroidType: AsteroidType = AsteroidTypeLarge()
 
 	private var direction: Float = 0f // degrees, 0 is to the right, -90 is straight up
 	private var x: Float = 0f // px, center of the ship
@@ -33,8 +30,8 @@ class Asteroid : SpaceObject {
 	override fun radius(): Float = asteroidType.radius()
 	override fun speed(): Pair<Float, Float> = Pair(speedX, speedY)
 
-	fun isLarge(): Boolean = asteroidType is LargeAsteroid
-	fun isMedium(): Boolean = asteroidType is MediumAsteroid
+	fun isLarge(): Boolean = asteroidType is AsteroidTypeLarge
+	fun isMedium(): Boolean = asteroidType is AsteroidTypeMedium
 	fun mass(): Float = asteroidType.mass()
 
 
@@ -43,9 +40,9 @@ class Asteroid : SpaceObject {
 	 */
 	fun spawn(size: SIZE, spawnPosition: Pair<Float, Float>?, direction: Float?, playerPosition: Pair<Float, Float>, minDistanceToPlayer: Float, viewportWidth: Float, viewportHeight: Float): Asteroid {
 		asteroidType = when (size) {
-			SIZE.LARGE -> LargeAsteroid()
-			SIZE.MEDIUM -> MediumAsteroid()
-			SIZE.SMALL -> SmallAsteroid()
+			SIZE.LARGE -> AsteroidTypeLarge()
+			SIZE.MEDIUM -> AsteroidTypeMedium()
+			SIZE.SMALL -> AsteroidTypeSmall()
 		}
 
 		if (spawnPosition == null) {
