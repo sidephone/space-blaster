@@ -7,7 +7,7 @@ import kotlin.math.log
 import kotlin.math.sin
 
 abstract class Explosion(private val startTime: Long, private val position: Pair<Float, Float>) {
-	private val particles = getParticles()
+	private val particles by lazy(LazyThreadSafetyMode.NONE) { getParticles() }
 
 	abstract fun color(): Int
 	abstract fun duration(): Long
