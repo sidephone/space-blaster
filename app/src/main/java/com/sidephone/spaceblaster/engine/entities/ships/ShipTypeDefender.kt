@@ -1,6 +1,7 @@
 package com.sidephone.spaceblaster.engine.entities.ships
 
 import com.sidephone.spaceblaster.engine.graphics.DrawCommand
+import kotlin.math.abs
 
 class ShipTypeDefender : ShipType {
 	companion object {
@@ -71,6 +72,11 @@ class ShipTypeDefender : ShipType {
 
 	override fun braking(): Float {
 		return BRAKING
+	}
+
+
+	override fun cannonLength(): Float {
+		return abs(Fuselage.TOP_Y)
 	}
 
 

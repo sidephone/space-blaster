@@ -15,6 +15,9 @@ class AsteroidList {
 	private var bumpsWithPlayer: Int = -1
 
 
+	fun getAll() = asteroids.toList()
+
+
 	fun draw(now: Long): List<DrawCommandGroup> {
 		return asteroids.map { asteroid -> asteroid.draw(now) }
 	}
@@ -39,7 +42,7 @@ class AsteroidList {
 	}
 
 
-	fun oneBumpsWithPlayer(): Int {
+	fun oneCrashesWithPlayer(): Int {
 		return bumpsWithPlayer
 	}
 

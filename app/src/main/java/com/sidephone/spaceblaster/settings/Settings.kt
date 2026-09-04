@@ -6,6 +6,7 @@ class Settings(context: android.content.Context) {
 	companion object {
 		private const val PREFS_NAME = "SpaceBlasterSettings"
 		private const val ASTEROIDS_BUMP_KEY = "asteroids_bump"
+		private const val BULLETS_WRAP_AROUND_KEY = "bullets_wrap_around"
 	}
 
 	object Gameplay {
@@ -19,5 +20,9 @@ class Settings(context: android.content.Context) {
 
 	fun getAsteroidsBump(): Boolean {
 		return sharedPreferences.getBoolean(ASTEROIDS_BUMP_KEY, true)
+	}
+
+	fun getBulletsWrapAround(): Boolean {
+		return sharedPreferences.getBoolean(BULLETS_WRAP_AROUND_KEY, true)
 	}
 }
