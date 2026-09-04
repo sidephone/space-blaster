@@ -3,10 +3,12 @@ An Asteroids-style game for Sidephone.
 
 ## TODO
 - Hyperspace jump
-- Countdown before stage
 - Saucers
-- Score + Bonuses (lives, faster shooting)
+- gameplay (stages, lives, faster shooting, more asteroids)
 - HUD
+  - game over does not work
+  - high score
+  - Countdown before stage
 - Settings screen
 - Sounds?
 - Extra player ships?

@@ -8,7 +8,6 @@ import android.util.Log
 import android.view.SurfaceHolder
 import android.view.SurfaceView
 import androidx.core.graphics.withMatrix
-import androidx.core.graphics.withTranslation
 import com.sidephone.spaceblaster.engine.Gameplay
 import com.sidephone.spaceblaster.engine.graphics.DrawCommand
 import com.sidephone.spaceblaster.engine.graphics.GameFrame
@@ -144,7 +143,14 @@ class GameSurfaceView(context: Context, private var gameplay: Gameplay, private 
 		for (commandGroup in frame.commandGroups) {
 			if (commandGroup.commands.isEmpty()) continue
 
-			canvas.withTranslation(commandGroup.x, commandGroup.y) {
+			val scale = commandGroup.scale
+			val matrix = Matrix()
+			matrix.postTranslate(commandGroup.x, commandGroup.y)
+			if (scale != 1f) {
+				matrix.postScale(scale, scale, commandGroup.x, commandGroup.y)
+			}
+
+			canvas.withMatrix(matrix) {
 				rotate(commandGroup.rotationDegrees)
 
 				for (command in commandGroup.commands) {

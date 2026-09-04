@@ -10,7 +10,7 @@ class AsteroidTypeLarge : AsteroidType() {
 
 		const val SURFACE_COLOR = 0xFF888888.toInt()
 
-		const val POINTS = 1
+		const val SCORE_POINTS = 1
 	}
 
 
@@ -32,6 +32,7 @@ class AsteroidTypeLarge : AsteroidType() {
 
 	override fun mass() = MASS
 	override fun radius() = RADIUS
+	override fun score() = SCORE_POINTS
 	override fun speed() = SPEED
 	override fun turnSpeed() = turnSpeed
 

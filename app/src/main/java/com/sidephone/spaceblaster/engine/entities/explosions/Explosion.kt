@@ -35,7 +35,7 @@ abstract class Explosion(private val startTime: Long, private val position: Pair
 	fun draw(now: Long): DrawCommandGroup {
 		val elapsedTime = now - startTime
 		if (position == null || elapsedTime > duration()) {
-			return DrawCommandGroup(0f, 0f, 0f, emptyList())
+			return DrawCommandGroup(0f, 0f, emptyList())
 		}
 
 		if (particles.isEmpty()) {
@@ -57,6 +57,6 @@ abstract class Explosion(private val startTime: Long, private val position: Pair
 			)
 		}
 
-		return DrawCommandGroup(position.first, position.second, 0f, drawCommands)
+		return DrawCommandGroup(position.first, position.second, drawCommands)
 	}
 }

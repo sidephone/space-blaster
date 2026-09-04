@@ -12,10 +12,12 @@ import com.sidephone.spaceblaster.engine.entities.explosions.Explosion
 import com.sidephone.spaceblaster.engine.entities.explosions.ExplosionTypeAsteroid
 import com.sidephone.spaceblaster.engine.entities.explosions.ExplosionTypeNull
 import com.sidephone.spaceblaster.engine.entities.explosions.ExplosionTypeShip
-import com.sidephone.spaceblaster.engine.entities.ships.Ship
+import com.sidephone.spaceblaster.engine.entities.ships.PlayerShip
 import com.sidephone.spaceblaster.engine.graphics.DrawCommandGroup
 import com.sidephone.spaceblaster.engine.graphics.GameFrame
 import com.sidephone.spaceblaster.settings.Settings
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import java.util.concurrent.Executors
 import java.util.concurrent.Future
 import java.util.concurrent.TimeUnit
@@ -42,6 +44,15 @@ class Gameplay(private val settings: Settings?) {
 	private var onStartButtonPressed = {}
 	private var onStarted = {}
 
+	val isGameOver: StateFlow<Boolean>
+		get() = player.isDeadForever
+
+	val lives: StateFlow<Int>
+		get() = player.lives
+
+	private val _score = MutableStateFlow(0)
+	val score: StateFlow<Int> = _score
+
 	// graphics
 	@Volatile private var viewportWidth = 1f
 	@Volatile private var viewportHeight = 1f
@@ -51,14 +62,13 @@ class Gameplay(private val settings: Settings?) {
 	private var asteroids = AsteroidList()
 	private var asteroidExplosion: Explosion = ExplosionTypeNull()
 
-	private val player = Ship()
+	private val player = PlayerShip()
 	private val playerBullets = PlayerBullets()
 	private var playerExplosion: Explosion = ExplosionTypeNull()
 	private val space = Space()
 
 	// game state
 	private var stage = 1
-	private var isGameOver = false
 
 
 	/**
@@ -68,14 +78,14 @@ class Gameplay(private val settings: Settings?) {
 	fun reset() {
 		pressedKeys = setOf()
 
-		isGameOver = false
-		stage = 1
-
 		space.bigBang(viewportWidth, viewportHeight)
 		player.resetLives()
 		player.spawn(System.currentTimeMillis(), viewportWidth, viewportHeight)
 		playerBullets.reset(settings, stage)
 		asteroids.spawn(settings, stage, player, viewportWidth, viewportHeight)
+
+		_score.value = 0
+		stage = 1
 
 		if (!isGameThreadAlive()) {
 			if (!executor.isShutdown && !executor.isTerminated) {
@@ -194,7 +204,13 @@ class Gameplay(private val settings: Settings?) {
 	 */
 	@MainThread
 	fun onStartButton() {
-		pause()
+		if (isGameOver.value) {
+			stop()
+			reset()
+		} else {
+			pause()
+		}
+
 		onStartButtonPressed()
 	}
 
@@ -298,9 +314,9 @@ class Gameplay(private val settings: Settings?) {
 		asteroidExplosion.spread(now)
 		asteroids.move(now, player, viewportWidth, viewportHeight)
 
-
 		val playerBulletHit = playerBullets.hitsTarget()
 		if (playerBulletHit >= 0) {
+			_score.value += asteroids.score(playerBulletHit)
 			asteroidExplosion = ExplosionTypeAsteroid(now, asteroids.position(playerBulletHit))
 			asteroids.split(playerBulletHit, player, viewportWidth, viewportHeight)
 		}
@@ -310,18 +326,22 @@ class Gameplay(private val settings: Settings?) {
 			player.die(now)
 			playerExplosion = ExplosionTypeShip(now, player.position())
 
+			_score.value += asteroids.score(crashedAsteroid)
+
 			asteroidExplosion = ExplosionTypeAsteroid(now, asteroids.position(crashedAsteroid))
 			asteroids.split(crashedAsteroid, player, viewportWidth, viewportHeight)
 		}
 
-
 		val screenObjects = mutableListOf<DrawCommandGroup>()
 		screenObjects.add(space.draw(now))
 		screenObjects.addAll(playerBullets.draw())
-		screenObjects.addAll(asteroids.draw(now))
+		screenObjects.addAll(asteroids.draw())
 		screenObjects.add(player.draw(now))
 		screenObjects.add(asteroidExplosion.draw(now))
 		screenObjects.add(playerExplosion.draw(now))
+
+		// small player ship for the hud
+		screenObjects.add(player.draw(20f, 30f, 0.58f))
 
 		currentFrame = GameFrame(Space.BACKGROUND, screenObjects)
 	}

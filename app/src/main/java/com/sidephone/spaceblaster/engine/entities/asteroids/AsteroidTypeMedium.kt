@@ -10,7 +10,7 @@ class AsteroidTypeMedium : AsteroidType() {
 
 		const val SURFACE_COLOR = 0xFFAAAAAA.toInt()
 
-		const val POINTS = 2
+		const val SCORE_POINTS = 2
 	}
 
 	object Patch {
@@ -30,6 +30,7 @@ class AsteroidTypeMedium : AsteroidType() {
 
 	override fun mass() = MASS
 	override fun radius() = RADIUS
+	override fun score() = SCORE_POINTS
 	override fun speed() = SPEED
 	override fun turnSpeed() = turnSpeed
 
