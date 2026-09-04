@@ -43,8 +43,10 @@ abstract class Explosion(private val startTime: Long, private val position: Pair
 			return DrawCommandGroup(position.first, position.second, 0f, emptyList())
 		}
 
-		val alpha = 255 * (1 - log(elapsedTime.toDouble(), 1000.0) / log(duration().toDouble(), 1000.0))
-		val colorWithAlpha = (alpha.toInt() shl 24) or (color() and 0x00FFFFFF)
+		val elapsedForAlpha = elapsedTime.coerceAtLeast(1L)
+		val fade = 1 - log(elapsedForAlpha.toDouble(), 1000.0) / log(duration().toDouble(), 1000.0)
+		val alpha = (255.0 * fade).coerceIn(0.0, 255.0).toInt()
+		val colorWithAlpha = (alpha shl 24) or (color() and 0x00FFFFFF)
 
 		val drawCommands = particles.map { p ->
 			DrawCommand.Circle(
