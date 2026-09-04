@@ -14,8 +14,41 @@ class AsteroidList {
 	private var bumpsWithPlayer: Int = -1
 
 
+	fun draw(now: Long): List<DrawCommandGroup> {
+		return asteroids.map { asteroid -> asteroid.draw(now) }
+	}
+
+
+	fun move(now: Long, player: Ship, viewportWidth: Float, viewportHeight: Float) {
+		bumpsWithPlayer = -1
+
+		for ((i, asteroid) in asteroids.withIndex()) {
+			if (asteroid.shouldBump(now, player)) {
+				bumpsWithPlayer = i
+			} else if (bumpAsteroids) {
+				for (otherIndex in i + 1 until asteroids.size) {
+					if (asteroid.shouldBump(now, asteroids[otherIndex])) {
+						asteroid.bump(asteroids[otherIndex])
+					}
+				}
+			}
+
+			asteroid.move(now, viewportWidth, viewportHeight)
+		}
+	}
+
+
 	fun oneBumpsWithPlayer(): Int {
 		return bumpsWithPlayer
+	}
+
+
+	fun position(index: Int): Pair<Float, Float>? {
+		if (index < 0 || index >= asteroids.size) {
+			return null
+		}
+
+		return asteroids[index].position()
 	}
 
 
@@ -44,25 +77,6 @@ class AsteroidList {
 	}
 
 
-	fun move(now: Long, player: Ship, viewportWidth: Float, viewportHeight: Float) {
-		bumpsWithPlayer = -1
-
-		for ((i, asteroid) in asteroids.withIndex()) {
-			if (asteroid.shouldBump(now, player)) {
-				bumpsWithPlayer = i
-			} else if (bumpAsteroids) {
-				for (otherIndex in i + 1 until asteroids.size) {
-					if (asteroid.shouldBump(now, asteroids[otherIndex])) {
-						asteroid.bump(asteroids[otherIndex])
-					}
-				}
-			}
-
-			asteroid.move(now, viewportWidth, viewportHeight)
-		}
-	}
-
-
 	fun split(index: Int, player: Ship, viewportWidth: Float, viewportHeight: Float) {
 		val asteroid = asteroids.removeAt(index)
 
@@ -87,10 +101,5 @@ class AsteroidList {
 				viewportHeight
 			))
 		}
-	}
-
-
-	fun draw(now: Long): List<DrawCommandGroup> {
-		return asteroids.map { asteroid -> asteroid.draw(now) }
 	}
 }

@@ -142,6 +142,8 @@ class GameSurfaceView(context: Context, private var gameplay: Gameplay, private 
 		canvas.drawColor(frame.backgroundColor)
 
 		for (commandGroup in frame.commandGroups) {
+			if (commandGroup.commands.isEmpty()) continue
+
 			canvas.withTranslation(commandGroup.x, commandGroup.y) {
 				rotate(commandGroup.rotationDegrees)
 

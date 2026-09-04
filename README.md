@@ -2,7 +2,7 @@
 An Asteroids-style game for Sidephone.
 
 ## TODO
-- Explosions
+- Hyperspace jump
 - Countdown before stage
 - Shooting (+ setting to wrap around the screen)
 - Saucers
