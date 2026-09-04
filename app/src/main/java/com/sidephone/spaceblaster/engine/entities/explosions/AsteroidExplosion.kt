@@ -1,6 +1,6 @@
 package com.sidephone.spaceblaster.engine.entities.explosions
 
-class AsteroidExplosion(startTime: Long, position: Pair<Float, Float>) : Explosion(startTime, position) {
+class AsteroidExplosion(startTime: Long, position: Pair<Float, Float>?) : Explosion(startTime, position) {
 	companion object {
 		const val COLOR = 0x009A9A9A // alpha is applied depending on elapsed time
 		const val DURATION = 800L // ms

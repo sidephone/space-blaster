@@ -43,9 +43,9 @@ class AsteroidList {
 	}
 
 
-	fun position(index: Int): Pair<Float, Float> {
+	fun position(index: Int): Pair<Float, Float>? {
 		if (index < 0 || index >= asteroids.size) {
-			return Pair(Float.POSITIVE_INFINITY, Float.POSITIVE_INFINITY)
+			return null
 		}
 
 		return asteroids[index].position()
