@@ -44,6 +44,15 @@ class Ship : SpaceObject {
 	override fun radius(): Float = shipType.radius()
 	override fun speed(): Pair<Float, Float> = Pair(speedX, speedY)
 
+	fun cannonPosition(): Pair<Float, Float> {
+		val angle = Math.toRadians(direction.toDouble())
+		val length = shipType.cannonLength()
+		val cannonX = x + (length * cos(angle)).toFloat()
+		val cannonY = y + (length * sin(angle)).toFloat()
+		return Pair(cannonX, cannonY)
+	}
+
+	fun direction() = direction
 	fun isDead(now: Long) = lives <= 0 || (lastDeathTime + RESPAWN_DELAY > now)
 	fun minAsteroidSpawnDistance(): Float = shipType.radius() * 3f
 	fun speedDirection(): Float = Math.toDegrees(atan2(speedY.toDouble(), speedX.toDouble())).toFloat()

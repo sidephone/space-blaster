@@ -7,6 +7,7 @@ import androidx.annotation.MainThread
 import androidx.annotation.WorkerThread
 import com.sidephone.spaceblaster.engine.entities.Space
 import com.sidephone.spaceblaster.engine.entities.asteroids.AsteroidList
+import com.sidephone.spaceblaster.engine.entities.bullets.PlayerBullets
 import com.sidephone.spaceblaster.engine.entities.explosions.Explosion
 import com.sidephone.spaceblaster.engine.entities.explosions.ExplosionTypeAsteroid
 import com.sidephone.spaceblaster.engine.entities.explosions.ExplosionTypeNull
@@ -49,7 +50,9 @@ class Gameplay(private val settings: Settings?) {
 	// game objects
 	private var asteroids = AsteroidList()
 	private var asteroidExplosion: Explosion = ExplosionTypeNull()
+
 	private val player = Ship()
+	private val playerBullets = PlayerBullets()
 	private var playerExplosion: Explosion = ExplosionTypeNull()
 	private val space = Space()
 
@@ -71,6 +74,7 @@ class Gameplay(private val settings: Settings?) {
 		space.bigBang(viewportWidth, viewportHeight)
 		player.resetLives()
 		player.spawn(System.currentTimeMillis(), viewportWidth, viewportHeight)
+		playerBullets.reset(settings, stage)
 		asteroids.spawn(settings, stage, player, viewportWidth, viewportHeight)
 
 		if (!isGameThreadAlive()) {
@@ -274,6 +278,12 @@ class Gameplay(private val settings: Settings?) {
 		} else {
 			player.thrust(now, KeyEvent.KEYCODE_BUTTON_B in keys || KeyEvent.KEYCODE_DPAD_UP in keys)
 		}
+
+		if (KeyEvent.KEYCODE_BUTTON_A in keys && !player.isDead(now)) {
+			playerBullets.shoot(now, player.cannonPosition(), player.direction())
+		} else {
+			playerBullets.resetShootTime()
+		}
 	}
 
 
@@ -283,21 +293,31 @@ class Gameplay(private val settings: Settings?) {
 		player.revokeInvincibilityWhenExpired(now)
 		player.move(now, viewportWidth, viewportHeight)
 		playerExplosion.spread(now)
+		playerBullets.move(now, asteroids.getAll(), viewportWidth, viewportHeight)
 
 		asteroidExplosion.spread(now)
 		asteroids.move(now, player, viewportWidth, viewportHeight)
 
-		val asteroidIndex = asteroids.oneBumpsWithPlayer()
-		if (asteroidIndex >= 0) {
+
+		val playerBulletHit = playerBullets.hitsTarget()
+		if (playerBulletHit >= 0) {
+			asteroidExplosion = ExplosionTypeAsteroid(now, asteroids.position(playerBulletHit))
+			asteroids.split(playerBulletHit, player, viewportWidth, viewportHeight)
+		}
+
+		val crashedAsteroid = asteroids.oneCrashesWithPlayer()
+		if (crashedAsteroid >= 0) {
 			player.die(now)
 			playerExplosion = ExplosionTypeShip(now, player.position())
 
-			asteroidExplosion = ExplosionTypeAsteroid(now, asteroids.position(asteroidIndex))
-			asteroids.split(asteroidIndex, player, viewportWidth, viewportHeight)
+			asteroidExplosion = ExplosionTypeAsteroid(now, asteroids.position(crashedAsteroid))
+			asteroids.split(crashedAsteroid, player, viewportWidth, viewportHeight)
 		}
+
 
 		val screenObjects = mutableListOf<DrawCommandGroup>()
 		screenObjects.add(space.draw(now))
+		screenObjects.addAll(playerBullets.draw())
 		screenObjects.addAll(asteroids.draw(now))
 		screenObjects.add(player.draw(now))
 		screenObjects.add(asteroidExplosion.draw(now))
