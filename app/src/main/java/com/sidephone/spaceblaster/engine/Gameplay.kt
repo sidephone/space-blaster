@@ -41,7 +41,7 @@ class Gameplay(private val settings: Settings?) {
 	@Volatile private var pressedKeys = setOf<Int>()
 
 	// output
-	private var onStartButtonPressed = {}
+	private var onStartButtonPressed: () -> Unit = {}
 	private var onStarted = {}
 
 	val isGameOver: StateFlow<Boolean>
@@ -222,7 +222,7 @@ class Gameplay(private val settings: Settings?) {
 	 * back to the main menu or perform other actions.
 	 */
 	@MainThread
-	fun setOnStartButtonPressedCallback(callback: () -> Unit): Gameplay {
+	fun setOnStartButtonPressedCallback(callback: () -> Unit = {}): Gameplay {
 		onStartButtonPressed = callback
 		return this
 	}
