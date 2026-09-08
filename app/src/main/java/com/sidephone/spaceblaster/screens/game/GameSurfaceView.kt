@@ -250,6 +250,8 @@ class GameSurfaceView(context: Context, private var gameplay: Gameplay, private 
 
 	private fun drawText(canvas: Canvas, command: DrawCommand.Text) {
 		paint.color = command.color
+		paint.style = Paint.Style.FILL
+		paint.isAntiAlias = true
 		paint.textSize = command.textSize
 		canvas.drawText(command.text, command.x, command.y, paint)
 	}
