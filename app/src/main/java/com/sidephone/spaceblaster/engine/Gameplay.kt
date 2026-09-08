@@ -176,6 +176,9 @@ class Gameplay(private val settings: Settings?) {
 	fun stop() {
 		isPaused = false
 		executor.shutdownNow()
+		engineLooper?.cancel(true)
+		engineLooper = null
+
 		Log.d(LOG_TAG, "Gameplay loop stopped")
 	}
 
@@ -204,9 +207,8 @@ class Gameplay(private val settings: Settings?) {
 	 */
 	@MainThread
 	fun onStartButton() {
-		if (isGameOver.value) {
+		if (player.isDeadForever()) {
 			stop()
-			reset()
 		} else {
 			pause()
 		}

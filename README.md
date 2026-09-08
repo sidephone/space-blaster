@@ -6,9 +6,9 @@ An Asteroids-style game for Sidephone.
 - Saucers
 - gameplay (stages, lives, faster shooting, more asteroids)
 - HUD
-  - game over does not work
   - high score
   - Countdown before stage
 - Settings screen
+- Menu color scheme
 - Sounds?
 - Extra player ships?

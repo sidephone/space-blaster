@@ -18,16 +18,15 @@ class PlayerShip : Ship() {
 	private val _lives = MutableStateFlow(STARTING_LIVES)
 	val lives: StateFlow<Int> = _lives
 
-	private val _isDeadForever = MutableStateFlow(_lives.value <= 0)
+	private val _isDeadForever = MutableStateFlow(false)
 	val isDeadForever: StateFlow<Boolean> = _isDeadForever
 
-
 	override fun notBumpable(now: Long) = super.notBumpable(now) || isInvincible
-	override fun isDead(now: Long) = isDeadForever.value || (lastDeathTime + RESPAWN_DELAY > now)
-
+	override fun isDead(now: Long) = isDeadForever() || (lastDeathTime + RESPAWN_DELAY > now)
+	fun isDeadForever() = _lives.value <= 0
 
 	fun autoSpawnAfterDeath(now: Long, viewportWidth: Float, viewportHeight: Float) {
-		if (isDeadForever.value || lastDeathTime == 0L) return
+		if (isDeadForever() || lastDeathTime == 0L) return
 
 		if (now - lastDeathTime >= RESPAWN_DELAY) {
 			spawn(now, viewportWidth, viewportHeight)
@@ -36,7 +35,7 @@ class PlayerShip : Ship() {
 
 
 	override fun die(now: Long) {
-		if (isDeadForever.value) return
+		if (isDeadForever()) return
 		_lives.value--
 		_isDeadForever.value = _lives.value <= 0
 		lastDeathTime = now
@@ -79,11 +78,12 @@ class PlayerShip : Ship() {
 
 	override fun resetLives() {
 		_lives.value = STARTING_LIVES
+		_isDeadForever.value = _lives.value <= 0
 	}
 
 
 	override fun spawn(now: Long, viewportWidth: Float, viewportHeight: Float) {
-		if (isDeadForever.value) return
+		if (isDeadForever()) return
 
 		super.spawn(now, viewportWidth, viewportHeight)
 		isInvincible = true
