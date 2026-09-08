@@ -21,9 +21,13 @@ class Hud {
 
 	var icon: DrawCommandGroup? = null
 
+	private var icon: DrawCommandGroup? = null
+	private var iconViewportHeight: Float? = null
+
 	fun draw(viewportHeight: Float, player: PlayerShip): List<DrawCommandGroup> {
-		if (icon == null) {
+		if (icon == null || iconViewportHeight != viewportHeight) {
 			icon = player.draw(Icon.X, viewportHeight - Icon.Y_BOTTOM, Icon.SCALE)
+			iconViewportHeight = viewportHeight
 		}
 
 		val output = mutableListOf<DrawCommandGroup>()
