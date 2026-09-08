@@ -5,6 +5,7 @@ import android.view.KeyEvent
 import androidx.annotation.AnyThread
 import androidx.annotation.MainThread
 import androidx.annotation.WorkerThread
+import com.sidephone.spaceblaster.engine.entities.Hud
 import com.sidephone.spaceblaster.engine.entities.Space
 import com.sidephone.spaceblaster.engine.entities.asteroids.AsteroidList
 import com.sidephone.spaceblaster.engine.entities.bullets.PlayerBullets
@@ -47,9 +48,6 @@ class Gameplay(private val settings: Settings?) {
 	val isGameOver: StateFlow<Boolean>
 		get() = player.isDeadForever
 
-	val lives: StateFlow<Int>
-		get() = player.lives
-
 	private val _score = MutableStateFlow(0)
 	val score: StateFlow<Int> = _score
 
@@ -65,6 +63,8 @@ class Gameplay(private val settings: Settings?) {
 	private val player = PlayerShip()
 	private val playerBullets = PlayerBullets()
 	private var playerExplosion: Explosion = ExplosionTypeNull()
+
+	private val hud = Hud()
 	private val space = Space()
 
 	// game state
@@ -257,6 +257,7 @@ class Gameplay(private val settings: Settings?) {
 		try {
 			val now = System.currentTimeMillis()
 			processGameInput(now)
+			doPhysics(now)
 			render(now)
 		} catch (e: Exception) {
 			Log.e(LOG_TAG, "Failed advancing ahead gameplay. ${e.message}", e)
@@ -306,7 +307,7 @@ class Gameplay(private val settings: Settings?) {
 
 
 	@WorkerThread
-	private fun render(now: Long) {
+	private fun doPhysics(now: Long) {
 		player.autoSpawnAfterDeath(now, viewportWidth, viewportHeight)
 		player.revokeInvincibilityWhenExpired(now)
 		player.move(now, viewportWidth, viewportHeight)
@@ -333,7 +334,11 @@ class Gameplay(private val settings: Settings?) {
 			asteroidExplosion = ExplosionTypeAsteroid(now, asteroids.position(crashedAsteroid))
 			asteroids.split(crashedAsteroid, player, viewportWidth, viewportHeight)
 		}
+	}
 
+
+	@WorkerThread
+	private fun render(now: Long) {
 		val screenObjects = mutableListOf<DrawCommandGroup>()
 		screenObjects.add(space.draw(now))
 		screenObjects.addAll(playerBullets.draw())
@@ -341,9 +346,7 @@ class Gameplay(private val settings: Settings?) {
 		screenObjects.add(player.draw(now))
 		screenObjects.add(asteroidExplosion.draw(now))
 		screenObjects.add(playerExplosion.draw(now))
-
-		// small player ship for the hud
-		screenObjects.add(player.draw(31f, viewportHeight - 31f, 0.61f))
+		screenObjects.addAll(hud.draw(viewportHeight, player))
 
 		currentFrame = GameFrame(Space.BACKGROUND, screenObjects)
 	}
