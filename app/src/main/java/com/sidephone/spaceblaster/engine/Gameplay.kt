@@ -343,7 +343,7 @@ class Gameplay(private val settings: Settings?) {
 		screenObjects.add(playerExplosion.draw(now))
 
 		// small player ship for the hud
-		screenObjects.add(player.draw(20f, 30f, 0.58f))
+		screenObjects.add(player.draw(32f, 42f, 0.61f))
 
 		currentFrame = GameFrame(Space.BACKGROUND, screenObjects)
 	}
