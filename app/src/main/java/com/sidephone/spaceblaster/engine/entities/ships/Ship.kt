@@ -32,7 +32,6 @@ abstract class Ship : SpaceObject {
 	abstract fun die(now: Long)
 	abstract fun draw(now: Long): DrawCommandGroup
 	abstract fun isDead(now: Long): Boolean
-	abstract fun isDeadForever(): Boolean
 	abstract fun resetLives()
 
 
@@ -72,8 +71,6 @@ abstract class Ship : SpaceObject {
 
 
 	open fun spawn(now: Long, viewportWidth: Float, viewportHeight: Float) {
-		if (isDeadForever()) return
-
 		shipType = ShipTypeDefender()
 
 		direction = shipType.drawDirection()

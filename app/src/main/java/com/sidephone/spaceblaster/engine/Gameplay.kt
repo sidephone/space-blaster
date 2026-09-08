@@ -78,14 +78,14 @@ class Gameplay(private val settings: Settings?) {
 	fun reset() {
 		pressedKeys = setOf()
 
+		_score.value = 0
+		stage = 1
+
 		space.bigBang(viewportWidth, viewportHeight)
 		player.resetLives()
 		player.spawn(System.currentTimeMillis(), viewportWidth, viewportHeight)
 		playerBullets.reset(settings, stage)
 		asteroids.spawn(settings, stage, player, viewportWidth, viewportHeight)
-
-		_score.value = 0
-		stage = 1
 
 		if (!isGameThreadAlive()) {
 			if (!executor.isShutdown && !executor.isTerminated) {
