@@ -68,7 +68,9 @@ class Gameplay(private val settings: Settings?) {
 	private val space = Space()
 
 	// game state
-	private var stage = 1
+	@Volatile private var nextStage = 0
+	@Volatile private var nextStageStartTime = 0L
+	@Volatile private var stage = 1
 
 
 	/**
@@ -79,13 +81,14 @@ class Gameplay(private val settings: Settings?) {
 		pressedKeys = setOf()
 
 		_score.value = 0
-		stage = 1
+		stage = 0
 
 		space.bigBang(viewportWidth, viewportHeight)
+		asteroids.clear()
 		player.resetLives()
 		player.spawn(System.currentTimeMillis(), viewportWidth, viewportHeight)
 		playerBullets.reset(settings, stage)
-		asteroids.spawn(settings, stage, player, viewportWidth, viewportHeight)
+		scheduleNextStage(System.currentTimeMillis())
 
 		if (!isGameThreadAlive()) {
 			if (!executor.isShutdown && !executor.isTerminated) {
@@ -257,7 +260,7 @@ class Gameplay(private val settings: Settings?) {
 		try {
 			val now = System.currentTimeMillis()
 			processGameInput(now)
-			doPhysics(now)
+			runLogic(now)
 			render(now)
 		} catch (e: Exception) {
 			Log.e(LOG_TAG, "Failed advancing ahead gameplay. ${e.message}", e)
@@ -307,7 +310,7 @@ class Gameplay(private val settings: Settings?) {
 
 
 	@WorkerThread
-	private fun doPhysics(now: Long) {
+	private fun runLogic(now: Long) {
 		player.autoSpawnAfterDeath(now, viewportWidth, viewportHeight)
 		player.revokeInvincibilityWhenExpired(now)
 		player.move(now, viewportWidth, viewportHeight)
@@ -334,6 +337,12 @@ class Gameplay(private val settings: Settings?) {
 			asteroidExplosion = ExplosionTypeAsteroid(now, asteroids.position(crashedAsteroid))
 			asteroids.split(crashedAsteroid, player, viewportWidth, viewportHeight)
 		}
+
+		startScheduledNextStage(now)
+
+		if (asteroids.isEmpty()) {
+			scheduleNextStage(now)
+		}
 	}
 
 
@@ -346,8 +355,30 @@ class Gameplay(private val settings: Settings?) {
 		screenObjects.add(player.draw(now))
 		screenObjects.add(asteroidExplosion.draw(now))
 		screenObjects.add(playerExplosion.draw(now))
-		screenObjects.addAll(hud.draw(viewportHeight, player))
+		screenObjects.addAll(hud.draw(now, viewportWidth, viewportHeight, player, nextStageStartTime))
 
 		currentFrame = GameFrame(Space.BACKGROUND, screenObjects)
+	}
+
+
+	@AnyThread
+	private fun scheduleNextStage(now: Long) {
+		if (isGameOver.value || now < nextStageStartTime) {
+			return
+		}
+
+		nextStage = stage + 1
+		nextStageStartTime = now + Settings.Gameplay.INITIAL_COUNTDOWN
+	}
+
+
+	@WorkerThread
+	private fun startScheduledNextStage(now: Long) {
+		if (nextStage == stage || nextStageStartTime > now) {
+			return
+		}
+
+		stage = nextStage
+		asteroids.spawn(settings, stage, player, viewportWidth, viewportHeight)
 	}
 }

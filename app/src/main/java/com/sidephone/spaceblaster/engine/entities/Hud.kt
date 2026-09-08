@@ -4,15 +4,21 @@ import android.graphics.Color
 import com.sidephone.spaceblaster.engine.entities.ships.PlayerShip
 import com.sidephone.spaceblaster.engine.graphics.DrawCommand
 import com.sidephone.spaceblaster.engine.graphics.DrawCommandGroup
+import kotlin.math.ceil
 
 class Hud {
+	object Countdown {
+		const val COLOR = Color.WHITE
+		const val SIZE = 45f
+	}
+
 	object Icon {
 		const val X = 32f
 		const val Y_BOTTOM = 30f
 		const val SCALE = 0.6f
 	}
 
-	object Text {
+	object Lives {
 		const val COLOR = Color.WHITE
 		const val X = 58f
 		const val Y_BOTTOM = 20f
@@ -22,7 +28,7 @@ class Hud {
 	private var icon: DrawCommandGroup? = null
 	private var iconViewportHeight: Float? = null
 
-	fun draw(viewportHeight: Float, player: PlayerShip): List<DrawCommandGroup> {
+	fun draw(now: Long, viewportWidth: Float, viewportHeight: Float, player: PlayerShip, countDownEnd: Long): List<DrawCommandGroup> {
 		if (icon == null || iconViewportHeight != viewportHeight) {
 			icon = player.draw(Icon.X, viewportHeight - Icon.Y_BOTTOM, Icon.SCALE)
 			iconViewportHeight = viewportHeight
@@ -30,18 +36,31 @@ class Hud {
 
 		val output = mutableListOf<DrawCommandGroup>()
 		icon?.let { output.add(it) }
-		output.addAll(drawText(viewportHeight, player))
+		output.add(printLives(viewportHeight, player))
+		output.add(printCountdown(now, viewportWidth, viewportHeight, countDownEnd))
 		return output
 	}
 
 
-	private fun drawText(viewportHeight: Float, player: PlayerShip): List<DrawCommandGroup> {
-		val output = mutableListOf<DrawCommandGroup>()
-		output.add(DrawCommandGroup(
-			Text.X,
-			viewportHeight - Text.Y_BOTTOM,
-			listOf(DrawCommand.Text("x ${player.lives.value}", 0f, 0f, Text.SIZE, Text.COLOR))
-		))
-		return output
+	private fun printCountdown(now: Long, viewportWidth: Float, viewportHeight: Float, countDownEnd: Long): DrawCommandGroup {
+		val remainingTime = ceil((countDownEnd - now) / 1000.0).toInt()
+		return if (remainingTime > 0) {
+			DrawCommandGroup(
+				viewportWidth / 2f,
+				viewportHeight / 2f,
+				listOf(DrawCommand.Text("$remainingTime", 0f, 0f, Countdown.SIZE, Countdown.COLOR))
+			)
+		} else {
+			DrawCommandGroup(0f, 0f, emptyList())
+		}
+	}
+
+
+	private fun printLives(viewportHeight: Float, player: PlayerShip): DrawCommandGroup {
+		return DrawCommandGroup(
+			Lives.X,
+			viewportHeight - Lives.Y_BOTTOM,
+			listOf(DrawCommand.Text("x ${player.lives.value}", 0f, 0f, Lives.SIZE, Lives.COLOR))
+		)
 	}
 }

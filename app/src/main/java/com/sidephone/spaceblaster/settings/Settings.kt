@@ -12,6 +12,7 @@ class Settings(context: android.content.Context) {
 	}
 
 	object Gameplay {
+		const val INITIAL_COUNTDOWN = 3000L // ms
 		const val TARGET_FPS = 120
 		const val TARGET_IPS = 60
 	}

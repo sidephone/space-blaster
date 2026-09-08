@@ -18,8 +18,18 @@ class AsteroidList {
 	fun getAll() = asteroids.toList()
 
 
+	fun clear() {
+		asteroids.clear()
+	}
+
+
 	fun draw(): List<DrawCommandGroup> {
 		return asteroids.map { asteroid -> asteroid.draw() }
+	}
+
+
+	fun isEmpty(): Boolean {
+		return asteroids.isEmpty()
 	}
 
 
@@ -76,7 +86,7 @@ class AsteroidList {
 
 		asteroids.clear()
 
-		repeat(MIN_ASTEROIDS + stage - 1) {
+		repeat(MIN_ASTEROIDS + (stage / 4)) {
 			asteroids.add(Asteroid().spawn(
 				Asteroid.SIZE.LARGE,
 				null,
