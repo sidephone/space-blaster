@@ -147,7 +147,7 @@ class GameSurfaceView(context: Context, private var gameplay: Gameplay, private 
 			val matrix = Matrix()
 			matrix.postTranslate(commandGroup.x, commandGroup.y)
 			if (scale != 1f) {
-				matrix.postScale(scale, scale)
+				matrix.postScale(scale, scale, commandGroup.x, commandGroup.y)
 			}
 
 			canvas.withMatrix(matrix) {
