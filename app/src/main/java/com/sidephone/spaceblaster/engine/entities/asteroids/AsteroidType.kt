@@ -4,11 +4,12 @@ import com.sidephone.spaceblaster.engine.graphics.DrawCommand
 import kotlin.math.ceil
 
 abstract class AsteroidType {
+	abstract fun draw(): List<DrawCommand>
 	abstract fun mass(): Float
 	abstract fun radius(): Float
+	abstract fun score(): Int
 	abstract fun speed(): Float
 	abstract fun turnSpeed(): Float
-	abstract fun draw(): List<DrawCommand>
 
 
 	protected fun drawMainSurface(radius: Float, color: Int): DrawCommand {

@@ -64,7 +64,7 @@ class Space {
 			starsTwinkled = false
 		}
 
-		return DrawCommandGroup(0f, 0f, 0f, starDrawCommands)
+		return DrawCommandGroup(0f, 0f, starDrawCommands)
 	}
 
 

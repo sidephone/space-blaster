@@ -1,5 +1,9 @@
 <resources>
-	<string name="app_name">Game Demo</string>
+	<string name="app_name">Space Blaster</string>
+
+	<string name="game_over">Game Over</string>
+	<string name="game_over_subtitle">Press Start or Enter to return to main menu</string>
+
 	<string name="main_new_game">New Game</string>
 	<string name="main_resume_game">Resume Game</string>
 	<string name="main_back">Back</string>

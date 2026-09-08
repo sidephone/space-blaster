@@ -54,7 +54,7 @@ class MainActivity : ComponentActivity() {
 				}
 
 				Box(modifier = Modifier.fillMaxSize()) {
-					GameScreen(gameplay) // Keep this in memory due to an Android bug. See below.
+					GameScreen(gameplay, -666, currentScreen) // Keep this in memory due to an Android bug. See below.
 
 					when (currentScreen) {
 						ScreenType.Menu -> MainMenuScreen(

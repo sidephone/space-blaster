@@ -18,8 +18,8 @@ class AsteroidList {
 	fun getAll() = asteroids.toList()
 
 
-	fun draw(now: Long): List<DrawCommandGroup> {
-		return asteroids.map { asteroid -> asteroid.draw(now) }
+	fun draw(): List<DrawCommandGroup> {
+		return asteroids.map { asteroid -> asteroid.draw() }
 	}
 
 
@@ -53,6 +53,15 @@ class AsteroidList {
 		}
 
 		return asteroids[index].position()
+	}
+
+
+	fun score(index: Int): Int {
+		if (index < 0 || index >= asteroids.size) {
+			return 0
+		}
+
+		return asteroids[index].score()
 	}
 
 

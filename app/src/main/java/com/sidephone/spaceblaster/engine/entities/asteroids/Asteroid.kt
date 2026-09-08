@@ -33,6 +33,7 @@ class Asteroid : SpaceObject {
 	fun isLarge(): Boolean = asteroidType is AsteroidTypeLarge
 	fun isMedium(): Boolean = asteroidType is AsteroidTypeMedium
 	fun mass(): Float = asteroidType.mass()
+	fun score(): Int = asteroidType.score()
 
 
 	/**
@@ -156,7 +157,7 @@ class Asteroid : SpaceObject {
 	}
 
 
-	fun draw(now: Long): DrawCommandGroup {
-		return DrawCommandGroup(x, y, direction, asteroidType.draw())
+	fun draw(): DrawCommandGroup {
+		return DrawCommandGroup(x, y, asteroidType.draw(), direction)
 	}
 }

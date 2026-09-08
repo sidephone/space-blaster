@@ -41,7 +41,6 @@ class Bullet(isEnemy: Boolean, private val canWrap: Boolean) {
 		return DrawCommandGroup(
 			x,
 			y,
-			0f,
 			if (isAirborne) drawCommands else emptyList()
 		)
 	}

@@ -8,18 +8,13 @@ import kotlin.math.cos
 import kotlin.math.sin
 import kotlin.math.sqrt
 
-class Ship : SpaceObject {
-	companion object {
-		const val INVINCIBILITY_DURATION = 2000L // ms
-		const val RESPAWN_DELAY = 1500L // ms
-		const val STARTING_LIVES = 3
-	}
+abstract class Ship : SpaceObject {
 
-	private var shipType: ShipType = ShipTypeDefender()
+	protected var shipType: ShipType = ShipTypeDefender()
 
-	private var direction: Float = 0f // degrees, 0 is to the right, -90 is straight up
-	private var x: Float = 0f // px, center of the ship
-	private var y: Float = 0f // px, center of the ship
+	protected var direction: Float = 0f // degrees, 0 is to the right, -90 is straight up
+	protected var x: Float = 0f // px, center of the ship
+	protected var y: Float = 0f // px, center of the ship
 	private var speedX = 0f
 	private var speedY = 0f
 	private var accelerationMax: Float = 1f
@@ -27,19 +22,20 @@ class Ship : SpaceObject {
 	private var moveDtMax: Float = 1f
 	private var turnStepMax: Float = 1f
 
-	private var lastDeathTime = 0L
 	private var lastThrustTime = 0L // ms
 	private var lastMoveTime = 0L // ms
 	private var lastTurnTime = 0L // ms
 
-	private var isThrusting = false
-	private var isInvincible = false
-	private var invincibilityTimeout = 0L // ms
-
-	private var lives = STARTING_LIVES
+	protected var isThrusting = false
 
 
-	override fun notBumpable(now: Long): Boolean = isDead(now) || isInvincible
+	abstract fun die(now: Long)
+	abstract fun draw(now: Long): DrawCommandGroup
+	abstract fun isDead(now: Long): Boolean
+	abstract fun resetLives()
+
+
+	override fun notBumpable(now: Long): Boolean = isDead(now)
 	override fun position(): Pair<Float, Float> = Pair(x, y)
 	override fun radius(): Float = shipType.radius()
 	override fun speed(): Pair<Float, Float> = Pair(speedX, speedY)
@@ -51,34 +47,12 @@ class Ship : SpaceObject {
 		val cannonY = y + (length * sin(angle)).toFloat()
 		return Pair(cannonX, cannonY)
 	}
-
 	fun direction() = direction
-	fun isDead(now: Long) = lives <= 0 || (lastDeathTime + RESPAWN_DELAY > now)
 	fun minAsteroidSpawnDistance(): Float = shipType.radius() * 3f
 	fun speedDirection(): Float = Math.toDegrees(atan2(speedY.toDouble(), speedX.toDouble())).toFloat()
 
 
-	fun autoSpawnAfterDeath(now: Long, viewportWidth: Float, viewportHeight: Float) {
-		if (lives <= 0 || lastDeathTime == 0L) return
 
-		if (now - lastDeathTime >= RESPAWN_DELAY) {
-			spawn(now, viewportWidth, viewportHeight)
-		}
-	}
-
-
-	fun die(now: Long) {
-		if (lives <= 0) return
-		lives--
-		lastDeathTime = now
-	}
-
-
-	/**
-	 * Use the current ship speed to calculate the new position of the ship based on the elapsed time
-	 * since the last move. Movement could occur after calling thrust(), but also when the ship is
-	 * coasting in space.
-	 */
 	fun move(now: Long, viewportWidth: Float, viewportHeight: Float) {
 		if (isDead(now)) return
 
@@ -96,16 +70,7 @@ class Ship : SpaceObject {
 	}
 
 
-	fun revokeInvincibilityWhenExpired(now: Long) {
-		if (now >= invincibilityTimeout) {
-			isInvincible = false
-		}
-	}
-
-
-	fun spawn(now: Long, viewportWidth: Float, viewportHeight: Float) {
-		if (lives <= 0) return
-
+	open fun spawn(now: Long, viewportWidth: Float, viewportHeight: Float) {
 		shipType = ShipTypeDefender()
 
 		direction = shipType.drawDirection()
@@ -123,21 +88,9 @@ class Ship : SpaceObject {
 		lastTurnTime = 0L
 
 		isThrusting = false
-		isInvincible = true
-		invincibilityTimeout = now + INVINCIBILITY_DURATION
-		lastDeathTime = 0L
 	}
 
 
-	fun resetLives() {
-		lives = STARTING_LIVES
-	}
-
-
-	/**
-	 * Calculate the new speed of the ship based on its braking power. This does NOT change the
-	 * position of the ship, that is done in move().
-	 */
 	fun stop(now: Long) {
 		if (isDead(now)) return
 
@@ -164,10 +117,6 @@ class Ship : SpaceObject {
 	}
 
 
-	/**
-	 * Calculate the new speed of the ship based on its acceleration and direction. This does NOT
-	 * change the position of the ship, that is done in move().
-	 */
 	fun thrust(now: Long, thrusting: Boolean) {
 		if (isDead(now)) return
 
@@ -193,9 +142,6 @@ class Ship : SpaceObject {
 	}
 
 
-	/**
-	 * Change the ship orientation
-	 */
 	fun turn(now: Long, left: Boolean) {
 		if (isDead(now)) return
 
@@ -203,21 +149,5 @@ class Ship : SpaceObject {
 		lastTurnTime = now
 
 		direction += if (left) -turnSpeed else turnSpeed
-	}
-
-
-	fun draw(now: Long): DrawCommandGroup {
-		if (isDead(now)) {
-			return DrawCommandGroup(0f, 0f, 0f, emptyList())
-		}
-
-		val blink = (isInvincible && (now % 200L < 100L))
-
-		return DrawCommandGroup(
-			x,
-			y,
-			direction - shipType.drawDirection(),
-			if (blink) emptyList() else shipType.draw(now, isThrusting)
-		)
 	}
 }
