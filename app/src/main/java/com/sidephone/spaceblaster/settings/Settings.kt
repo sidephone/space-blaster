@@ -32,7 +32,7 @@ class Settings(context: android.content.Context) {
 		return sharedPreferences.getInt(HIGH_SCORE_KEY, 0)
 	}
 
-fun updateHighScoreIfNeeded(newScore: Int): Boolean {
+	fun updateHighScoreIfNeeded(newScore: Int): Boolean {
 		val currentHighScore = getHighScore()
 		if (newScore > currentHighScore) {
 			sharedPreferences.edit { putInt(HIGH_SCORE_KEY, newScore) }
