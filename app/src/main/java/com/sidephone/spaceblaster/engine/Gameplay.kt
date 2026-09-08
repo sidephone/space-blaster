@@ -207,7 +207,7 @@ class Gameplay(private val settings: Settings?) {
 	 */
 	@MainThread
 	fun onStartButton() {
-		if (player.isDeadForever()) {
+		if (player.isDeadForever.value) {
 			stop()
 		} else {
 			pause()
