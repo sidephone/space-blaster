@@ -19,8 +19,6 @@ class Hud {
 		const val SIZE = 30f
 	}
 
-	var icon: DrawCommandGroup? = null
-
 	private var icon: DrawCommandGroup? = null
 	private var iconViewportHeight: Float? = null
 
