@@ -1,5 +1,6 @@
 package com.sidephone.spaceblaster.screens.game
 
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme.typography
@@ -15,26 +16,15 @@ import com.sidephone.spaceblaster.ui.theme.Dimens
 
 @Composable
 fun HudOverlay(textColor: Color, highScore: Int, gameplay: Gameplay) {
-	val lives by gameplay.lives.collectAsState()
 	val score by gameplay.score.collectAsState()
 
-	Text(
-		text = "x $lives",
-		style = typography.bodyLarge,
-		color = textColor,
-		textAlign = TextAlign.Left,
-		modifier = Modifier
-			.fillMaxWidth()
-			.padding(top = Dimens.HudPadding, start = Dimens.HudPaddingLeft, end = Dimens.HudPaddingLeft)
-	)
-
-	Text(
-		text = "[ $score ] [ $highScore ]",
-		style = typography.bodyLarge,
-		color = textColor,
-		textAlign = TextAlign.Center,
-		modifier = Modifier
-			.fillMaxWidth()
-			.padding(Dimens.HudPadding)
-	)
+	Row(modifier = Modifier.padding(Dimens.HudPadding)) {
+		Text(
+			text = "Score: $score・High: $highScore",
+			style = typography.bodyLarge,
+			color = textColor,
+			textAlign = TextAlign.Center,
+			modifier = Modifier.fillMaxWidth()
+		)
+	}
 }

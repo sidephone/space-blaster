@@ -1,12 +1,14 @@
 package com.sidephone.spaceblaster.settings
 
 import android.content.SharedPreferences
+import androidx.core.content.edit
 
 class Settings(context: android.content.Context) {
 	companion object {
 		private const val PREFS_NAME = "SpaceBlasterSettings"
 		private const val ASTEROIDS_BUMP_KEY = "asteroids_bump"
 		private const val BULLETS_WRAP_AROUND_KEY = "bullets_wrap_around"
+		private const val HIGH_SCORE_KEY = "high_score"
 	}
 
 	object Gameplay {
@@ -24,5 +26,19 @@ class Settings(context: android.content.Context) {
 
 	fun getBulletsWrapAround(): Boolean {
 		return sharedPreferences.getBoolean(BULLETS_WRAP_AROUND_KEY, true)
+	}
+
+	fun getHighScore(): Int {
+		return sharedPreferences.getInt(HIGH_SCORE_KEY, 0)
+	}
+
+	fun updateHighScoreIfNeeded(newScore: Int): Boolean {
+		val currentHighScore = getHighScore()
+		if (newScore > currentHighScore) {
+			sharedPreferences.edit { putInt(HIGH_SCORE_KEY, newScore) }
+			return true
+		}
+
+		return false
 	}
 }
