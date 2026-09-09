@@ -6,7 +6,8 @@ import com.sidephone.spaceblaster.settings.Settings
 
 abstract class BulletList {
 	protected var bullets = mutableListOf<Bullet>()
-	private var hitsTarget = -1
+	private var hitTargetId = -1
+	private var hittingBulletDirection = 0f
 	private var lastShootTime = 0L
 
 
@@ -19,18 +20,20 @@ abstract class BulletList {
 	}
 
 
-	fun hitsTarget() = hitsTarget
+	fun hitTargetId() = hitTargetId
+	fun hittingBulletDirection() = hittingBulletDirection
 
 
 	fun move(now: Long, targets: List<SpaceObject>, viewportWidth: Float, viewportHeight: Float) {
-		hitsTarget = -1
+		hitTargetId = -1
 
 		for (bullet in bullets) {
 			bullet.move(now, viewportWidth, viewportHeight)
 
 			for ((index, target) in targets.withIndex()) {
 				if (bullet.hits(target)) {
-					hitsTarget = index
+					hitTargetId = index
+					hittingBulletDirection = bullet.direction()
 					bullet.stop()
 					break
 				}
@@ -40,7 +43,7 @@ abstract class BulletList {
 
 
 	fun reset(settings: Settings?, stage: Int) {
-		hitsTarget = -1
+		hitTargetId = -1
 		resetBullets(settings, stage)
 	}
 
