@@ -46,14 +46,19 @@ class Asteroid : SpaceObject {
 			SIZE.SMALL -> AsteroidTypeSmall()
 		}
 
+		// if no position is provided, spawn the asteroid at a random position outside the viewport, but
+		// not too close to the player
 		if (spawnPosition == null) {
 			var distanceToPlayer: Float
-			do {
-				x = (viewportWidth * Math.random()).toFloat()
-				y = (viewportHeight * Math.random()).toFloat()
+			repeat(5) {
+				x = viewportWidth + AsteroidTypeLarge.RADIUS * 2f * Math.random().toFloat()
+				y = viewportHeight + AsteroidTypeLarge.RADIUS * 2f * Math.random().toFloat()
 				distanceToPlayer = sqrt((x - playerPosition.first) * (x - playerPosition.first) + (y - playerPosition.second) * (y - playerPosition.second))
-			} while (distanceToPlayer < minDistanceToPlayer)
-		} else {
+				if (distanceToPlayer >= minDistanceToPlayer) return@repeat
+			}
+		}
+		// if a position is provided (e.g. when splitting an asteroid), use that position
+		else {
 			x = spawnPosition.first
 			y = spawnPosition.second
 		}
@@ -144,14 +149,17 @@ class Asteroid : SpaceObject {
 		val turnSpeed = rawTurnSpeed.coerceIn(-maxTurnStep, maxTurnStep)
 
 		direction += turnSpeed
-		x += speedX * dt
-		y += speedY * dt
+		val dx = speedX * dt
+		val dy = speedY * dt
+
+		x += dx
+		y += dy
 
 		// wrap around the screen edges
-		if (x < 0) x = viewportWidth
-		if (y < 0) y = viewportHeight
-		if (x > viewportWidth) x = 0f
-		if (y > viewportHeight) y = 0f
+		if (x < 0 && dx < 0) x = viewportWidth
+		if (y < 0 && dy < 0) y = viewportHeight
+		if (x > viewportWidth && dx > 0) x = 0f
+		if (y > viewportHeight && dy > 0) y = 0f
 
 		lastMoveTime = now
 	}
