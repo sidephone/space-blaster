@@ -52,7 +52,6 @@ abstract class Ship : SpaceObject {
 	fun speedDirection(): Float = Math.toDegrees(atan2(speedY.toDouble(), speedX.toDouble())).toFloat()
 
 
-
 	fun move(now: Long, viewportWidth: Float, viewportHeight: Float) {
 		if (isDead(now)) return
 

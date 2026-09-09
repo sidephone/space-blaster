@@ -270,6 +270,15 @@ class Gameplay(private val settings: Settings?) {
 	}
 
 
+	private fun increaseScore(points: Int) {
+		if (_score.value % Settings.Gameplay.BONUS_LIVE_POINTS > (_score.value + points) % Settings.Gameplay.BONUS_LIVE_POINTS) {
+			player.addLife()
+		}
+
+		_score.value += points
+	}
+
+
 	/**
 	 * Perform any non-game related actions, immediately after receiving the pressed keys. For example,
 	 * pause the game, when "KeyEvent.KEYCODE_BUTTON_START" is pressed.
@@ -324,7 +333,7 @@ class Gameplay(private val settings: Settings?) {
 
 		val playerBulletHit = playerBullets.hitsTarget()
 		if (playerBulletHit >= 0) {
-			_score.value += asteroids.score(playerBulletHit)
+			increaseScore(asteroids.score(playerBulletHit))
 			asteroidExplosion = ExplosionTypeAsteroid(now, asteroids.position(playerBulletHit))
 			asteroids.split(playerBulletHit, player, viewportWidth, viewportHeight)
 		}
@@ -334,7 +343,7 @@ class Gameplay(private val settings: Settings?) {
 			player.die(now)
 			playerExplosion = ExplosionTypeShip(now, player.position())
 
-			_score.value += asteroids.score(crashedAsteroid)
+			increaseScore(asteroids.score(crashedAsteroid))
 
 			asteroidExplosion = ExplosionTypeAsteroid(now, asteroids.position(crashedAsteroid))
 			asteroids.split(crashedAsteroid, player, viewportWidth, viewportHeight)
