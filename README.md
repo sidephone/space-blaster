@@ -8,7 +8,6 @@ An Asteroids-style game for Sidephone.
   - ~~stages~~,
   - win lives every X points,
   - faster shooting and more bullets (with a limit)
-  - more asteroids (with a limit)
   - faster asteroids?
 - Settings screen
 - Menu color scheme
