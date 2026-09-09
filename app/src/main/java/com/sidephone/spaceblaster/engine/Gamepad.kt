@@ -43,6 +43,7 @@ class Gamepad {
 		return when (keyCode) {
 			// QWERTY
 			KeyEvent.KEYCODE_SPACE,
+			KeyEvent.KEYCODE_DEL,
 			// gamepad
 			KeyEvent.KEYCODE_BUTTON_A,
 			KeyEvent.KEYCODE_BUTTON_B,
@@ -62,6 +63,7 @@ class Gamepad {
 	private fun normalizeKeyCode(keyCode: Int): Int {
 		return when (keyCode) {
 			KeyEvent.KEYCODE_SPACE -> KeyEvent.KEYCODE_BUTTON_A
+			KeyEvent.KEYCODE_DEL -> KeyEvent.KEYCODE_BUTTON_Y
 			else -> keyCode
 		}
 	}

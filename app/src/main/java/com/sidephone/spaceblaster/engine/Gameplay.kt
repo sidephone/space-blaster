@@ -6,6 +6,7 @@ import androidx.annotation.AnyThread
 import androidx.annotation.MainThread
 import androidx.annotation.WorkerThread
 import com.sidephone.spaceblaster.engine.entities.Hud
+import com.sidephone.spaceblaster.engine.entities.HyperspaceJump
 import com.sidephone.spaceblaster.engine.entities.Space
 import com.sidephone.spaceblaster.engine.entities.asteroids.AsteroidList
 import com.sidephone.spaceblaster.engine.entities.bullets.PlayerBullets
@@ -61,6 +62,8 @@ class Gameplay(private val settings: Settings?) {
 	private var asteroids = AsteroidList()
 	private var asteroidExplosion: Explosion = ExplosionTypeNull()
 
+	private var hyperspaceJump = HyperspaceJump()
+
 	private val player = PlayerShip()
 	private val playerBullets = PlayerBullets()
 	private var playerExplosion: Explosion = ExplosionTypeNull()
@@ -72,6 +75,7 @@ class Gameplay(private val settings: Settings?) {
 	@Volatile private var nextStage = 0
 	@Volatile private var nextStageStartTime = 0L
 	@Volatile private var stage = 0
+	@Volatile private var jumpKeyDown = false
 
 
 	/**
@@ -80,6 +84,7 @@ class Gameplay(private val settings: Settings?) {
 	@MainThread
 	fun reset() {
 		pressedKeys = setOf()
+		jumpKeyDown = false
 
 		_score.value = 0
 		stage = 0
@@ -307,16 +312,27 @@ class Gameplay(private val settings: Settings?) {
 			player.turn(now, left = leftPressed)
 		}
 
-		if (KeyEvent.KEYCODE_BUTTON_Y in keys || KeyEvent.KEYCODE_DPAD_DOWN in keys) {
+		if (KeyEvent.KEYCODE_BUTTON_X in keys || KeyEvent.KEYCODE_DPAD_DOWN in keys) {
 			player.stop(now)
 		} else {
-			player.thrust(now, KeyEvent.KEYCODE_BUTTON_B in keys || KeyEvent.KEYCODE_DPAD_UP in keys)
+			player.thrust(now, KeyEvent.KEYCODE_BUTTON_A in keys || KeyEvent.KEYCODE_DPAD_UP in keys)
 		}
 
-		if (KeyEvent.KEYCODE_BUTTON_A in keys && !player.isDead(now)) {
+		if (KeyEvent.KEYCODE_BUTTON_B in keys && !player.isDead(now)) {
 			playerBullets.shoot(now, player.cannonPosition(), player.direction())
 		} else {
 			playerBullets.resetShootTime()
+		}
+
+		if (KeyEvent.KEYCODE_BUTTON_Y in keys || KeyEvent.KEYCODE_DEL in keys) {
+			jumpKeyDown = true
+		} else if (jumpKeyDown) {
+			jumpKeyDown = false
+			if (!player.isDead(now)) {
+				hyperspaceJump.enterHyperspace(now, player.position())
+				player.jump(now, viewportWidth, viewportHeight)
+				hyperspaceJump.exitHyperspace(player.position())
+			}
 		}
 	}
 
@@ -381,6 +397,7 @@ class Gameplay(private val settings: Settings?) {
 		screenObjects.add(asteroidExplosion.draw(now))
 		screenObjects.add(playerExplosion.draw(now))
 		screenObjects.addAll(hud.draw(now, viewportWidth, viewportHeight, player, nextStageStartTime))
+		hyperspaceJump.draw(now)?.let { screenObjects.addAll(it) }
 
 		currentFrame = GameFrame(Space.BACKGROUND, screenObjects)
 	}

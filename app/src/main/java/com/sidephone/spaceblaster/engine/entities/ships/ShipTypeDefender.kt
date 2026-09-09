@@ -22,6 +22,15 @@ class ShipTypeDefender : ShipType {
 		const val RADIUS: Float = 3.5f * SIZE_UNIT
 	}
 
+	object Fire {
+		const val COLOR = 0XFFFFD700.toInt()
+		const val REAR_Y = Fuselage.WING_HOLDER_TOP + Fuselage.WING_HOLDER_HEIGHT
+		const val HALF_WIDTH = Fuselage.CENTER_HALF_WIDTH
+		const val PHASE_TIME = 60L // ms, time for each flame phase
+		val LENGTHS = floatArrayOf(15f, 21f, 17f, 24f, 18f, 22f)
+		val OFFSETS = floatArrayOf(0f, -1.5f, 1f, -2f, 2f, -0.5f)
+	}
+
 	object Fuselage {
 		const val COLOR: Int = 0XFF00B300.toInt()
 		const val TOP_Y = -25.5f * SIZE_UNIT
@@ -43,16 +52,6 @@ class ShipTypeDefender : ShipType {
 		const val INNER_X = 20f * SIZE_UNIT
 		const val WIDTH = 4f * SIZE_UNIT
 		const val HEIGHT = 24f * SIZE_UNIT
-	}
-
-
-	object Fire {
-		const val COLOR = 0XFFFFD700.toInt()
-		const val REAR_Y = Fuselage.WING_HOLDER_TOP + Fuselage.WING_HOLDER_HEIGHT
-		const val HALF_WIDTH = Fuselage.CENTER_HALF_WIDTH
-		const val PHASE_TIME = 60L // ms, time for each flame phase
-		val LENGTHS = floatArrayOf(15f, 21f, 17f, 24f, 18f, 22f)
-		val OFFSETS = floatArrayOf(0f, -1.5f, 1f, -2f, 2f, -0.5f)
 	}
 
 	private var drawCommandCache = emptyList<DrawCommand>()
