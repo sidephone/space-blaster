@@ -7,6 +7,7 @@ import com.sidephone.spaceblaster.settings.Settings
 class AsteroidList {
 	companion object {
 		const val MIN_ASTEROIDS = 3
+		const val MAX_ASTEROIDS = 20
 	}
 
 	private val asteroids: MutableList<Asteroid> = mutableListOf()
@@ -86,7 +87,7 @@ class AsteroidList {
 
 		asteroids.clear()
 
-		repeat(MIN_ASTEROIDS + (stage / 4)) {
+		repeat((MIN_ASTEROIDS + (stage / 4)).coerceAtMost(MAX_ASTEROIDS)) {
 			asteroids.add(Asteroid().spawn(
 				Asteroid.SIZE.LARGE,
 				null,
