@@ -4,9 +4,12 @@ An Asteroids-style game for Sidephone.
 ## TODO
 - Hyperspace jump
 - Saucers
-- gameplay (stages, lives, faster shooting, more asteroids)
-- HUD
-  - Countdown before stage
+- gameplay
+  - ~~stages~~,
+  - win lives every X points,
+  - faster shooting and more bullets (with a limit)
+  - more asteroids (with a limit)
+  - faster asteroids?
 - Settings screen
 - Menu color scheme
 - Sounds?
