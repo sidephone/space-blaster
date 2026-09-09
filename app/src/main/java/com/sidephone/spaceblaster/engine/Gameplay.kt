@@ -17,6 +17,7 @@ import com.sidephone.spaceblaster.engine.entities.ships.PlayerShip
 import com.sidephone.spaceblaster.engine.graphics.DrawCommandGroup
 import com.sidephone.spaceblaster.engine.graphics.GameFrame
 import com.sidephone.spaceblaster.settings.Settings
+import com.sidephone.spaceblaster.settings.Settings.Player.BONUS_LIVE_POINTS
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import java.util.concurrent.Executors
@@ -271,7 +272,7 @@ class Gameplay(private val settings: Settings?) {
 
 
 	private fun increaseScore(points: Int) {
-		if (_score.value % Settings.Gameplay.BONUS_LIVE_POINTS > (_score.value + points) % Settings.Gameplay.BONUS_LIVE_POINTS) {
+		if (_score.value % BONUS_LIVE_POINTS > (_score.value + points) % BONUS_LIVE_POINTS) {
 			player.addLife()
 		}
 
@@ -390,6 +391,12 @@ class Gameplay(private val settings: Settings?) {
 		}
 
 		stage = nextStage
-		asteroids.spawn(settings, stage, player, viewportWidth, viewportHeight)
+		asteroids.spawn(
+			settings?.getAsteroidsBump() == true,
+			stage,
+			player,
+			viewportWidth,
+			viewportHeight
+		)
 	}
 }

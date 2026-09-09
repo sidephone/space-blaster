@@ -2,14 +2,11 @@ package com.sidephone.spaceblaster.engine.entities.asteroids
 
 import com.sidephone.spaceblaster.engine.entities.ships.Ship
 import com.sidephone.spaceblaster.engine.graphics.DrawCommandGroup
-import com.sidephone.spaceblaster.settings.Settings
+import com.sidephone.spaceblaster.settings.Settings.Asteroids.MAX
+import com.sidephone.spaceblaster.settings.Settings.Asteroids.MIN
+import com.sidephone.spaceblaster.settings.Settings.Asteroids.NEW_EVERY_N_STAGES
 
 class AsteroidList {
-	companion object {
-		const val MIN_ASTEROIDS = 3
-		const val MAX_ASTEROIDS = 20
-	}
-
 	private val asteroids: MutableList<Asteroid> = mutableListOf()
 
 	private var bumpAsteroids = false
@@ -77,17 +74,18 @@ class AsteroidList {
 
 
 	fun spawn(
-		settings: Settings?,
+		areAsteroidsBumpable: Boolean,
 		stage: Int,
 		player: Ship,
 		viewportWidth: Float,
 		viewportHeight: Float
 	) {
-		bumpAsteroids = settings?.getAsteroidsBump() == true
+		bumpAsteroids = areAsteroidsBumpable
 
 		asteroids.clear()
 
-		repeat((MIN_ASTEROIDS + (stage / 4)).coerceAtMost(MAX_ASTEROIDS)) {
+		val numAsteroids = (MIN + (stage / NEW_EVERY_N_STAGES)).coerceAtMost(MAX)
+		repeat(numAsteroids) {
 			asteroids.add(Asteroid().spawn(
 				Asteroid.SIZE.LARGE,
 				null,

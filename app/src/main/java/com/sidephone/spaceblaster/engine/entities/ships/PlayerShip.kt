@@ -1,16 +1,13 @@
 package com.sidephone.spaceblaster.engine.entities.ships
 
 import com.sidephone.spaceblaster.engine.graphics.DrawCommandGroup
+import com.sidephone.spaceblaster.settings.Settings.Player.INVINCIBILITY_DURATION
+import com.sidephone.spaceblaster.settings.Settings.Player.RESPAWN_DELAY
+import com.sidephone.spaceblaster.settings.Settings.Player.STARTING_LIVES
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
 class PlayerShip : Ship() {
-	companion object {
-		const val INVINCIBILITY_DURATION = 2000L // ms
-		const val RESPAWN_DELAY = 1500L // ms
-		const val STARTING_LIVES = 3
-	}
-
 	private var isInvincible = false
 	private var invincibilityTimeout = 0L // ms
 	private var lastDeathTime = 0L
