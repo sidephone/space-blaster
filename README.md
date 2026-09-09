@@ -4,10 +4,8 @@ An Asteroids-style game for Sidephone.
 ## TODO
 - Hyperspace jump
 - Saucers
-- gameplay
-  - faster shooting and more bullets (with a limit)
-  - faster asteroids?
 - Settings screen
 - Menu color scheme
+- icon and logo
 - Sounds?
 - Extra player ships?

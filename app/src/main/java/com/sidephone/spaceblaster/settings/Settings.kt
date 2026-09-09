@@ -11,11 +11,32 @@ class Settings(context: android.content.Context) {
 		private const val HIGH_SCORE_KEY = "high_score"
 	}
 
+	object Asteroids {
+		const val MIN = 3
+		const val MAX = 15
+		const val NEW_EVERY_N_STAGES = 4 // add an extra asteroid every 4 stages
+	}
+
 	object Gameplay {
-		const val BONUS_LIVE_POINTS = 400
 		const val STAGE_COUNTDOWN = 3000L // ms
 		const val TARGET_FPS = 120
 		const val TARGET_IPS = 60
+	}
+
+	object Player {
+		const val BONUS_LIVE_POINTS = 400
+		const val INVINCIBILITY_DURATION = 2000L // ms
+		const val RESPAWN_DELAY = 1500L // ms
+		const val STARTING_LIVES = 3
+	}
+
+	object PlayerBullets {
+		const val BONUS_EVERY_N_STAGES = 4 // award an extra bullet every 4 stages
+		const val BONUS_SHOOT_DELAY_PER_STAGE = 25L // ms (reduce the shoot delay by 25ms every stage)
+		const val MIN = 4
+		const val MAX = 10
+		const val SHOOT_DELAY = 750L // ms
+		const val SHOOT_DELAY_MIN = 100L // ms
 	}
 
 
