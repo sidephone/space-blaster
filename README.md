@@ -5,8 +5,6 @@ An Asteroids-style game for Sidephone.
 - Hyperspace jump
 - Saucers
 - gameplay
-  - ~~stages~~,
-  - win lives every X points,
   - faster shooting and more bullets (with a limit)
   - faster asteroids?
 - Settings screen

@@ -24,6 +24,13 @@ class PlayerShip : Ship() {
 	override fun notBumpable(now: Long) = super.notBumpable(now) || isInvincible
 	override fun isDead(now: Long) = isDeadForever.value || (lastDeathTime + RESPAWN_DELAY > now)
 
+
+	fun addLife() {
+		if (isDeadForever.value) return
+		_lives.value++
+	}
+
+
 	fun autoSpawnAfterDeath(now: Long, viewportWidth: Float, viewportHeight: Float) {
 		if (isDeadForever.value || lastDeathTime == 0L) return
 
