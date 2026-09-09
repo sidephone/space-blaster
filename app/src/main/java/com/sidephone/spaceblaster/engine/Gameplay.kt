@@ -88,6 +88,7 @@ class Gameplay(private val settings: Settings?) {
 		player.resetLives()
 		player.spawn(System.currentTimeMillis(), viewportWidth, viewportHeight)
 		playerBullets.reset(settings, stage)
+		nextStageStartTime = 0
 		scheduleNextStage(System.currentTimeMillis())
 
 		if (!isGameThreadAlive()) {
