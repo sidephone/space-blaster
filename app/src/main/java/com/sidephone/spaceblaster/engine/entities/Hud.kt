@@ -37,12 +37,12 @@ class Hud {
 		val output = mutableListOf<DrawCommandGroup>()
 		icon?.let { output.add(it) }
 		output.add(printLives(viewportHeight, player))
-		output.add(printCountdown(now, viewportWidth, viewportHeight, countDownEnd))
+		printCountdown(now, viewportWidth, viewportHeight, countDownEnd)?.let { output.add(it) }
 		return output
 	}
 
 
-	private fun printCountdown(now: Long, viewportWidth: Float, viewportHeight: Float, countDownEnd: Long): DrawCommandGroup {
+	private fun printCountdown(now: Long, viewportWidth: Float, viewportHeight: Float, countDownEnd: Long): DrawCommandGroup? {
 		val remainingTime = ceil((countDownEnd - now) / 1000.0).toInt()
 		return if (remainingTime > 0) {
 			DrawCommandGroup(
@@ -51,7 +51,7 @@ class Hud {
 				listOf(DrawCommand.Text("$remainingTime", 0f, 0f, Countdown.SIZE, Countdown.COLOR))
 			)
 		} else {
-			DrawCommandGroup(0f, 0f, emptyList())
+			null
 		}
 	}
 

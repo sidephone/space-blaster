@@ -70,7 +70,7 @@ class Gameplay(private val settings: Settings?) {
 	// game state
 	@Volatile private var nextStage = 0
 	@Volatile private var nextStageStartTime = 0L
-	@Volatile private var stage = 1
+	@Volatile private var stage = 0
 
 
 	/**
@@ -82,6 +82,7 @@ class Gameplay(private val settings: Settings?) {
 
 		_score.value = 0
 		stage = 0
+		nextStage = 0
 
 		space.bigBang(viewportWidth, viewportHeight)
 		asteroids.clear()
@@ -369,7 +370,7 @@ class Gameplay(private val settings: Settings?) {
 		}
 
 		nextStage = stage + 1
-		nextStageStartTime = now + Settings.Gameplay.INITIAL_COUNTDOWN
+		nextStageStartTime = now + Settings.Gameplay.STAGE_COUNTDOWN
 	}
 
 
