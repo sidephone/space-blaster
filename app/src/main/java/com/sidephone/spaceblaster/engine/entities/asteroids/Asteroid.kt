@@ -39,7 +39,15 @@ class Asteroid : SpaceObject {
 	/**
 	 * Spawn a random asteroid of a given size, not too close to the player
 	 */
-	fun spawn(size: SIZE, spawnPosition: Pair<Float, Float>?, direction: Float?, playerPosition: Pair<Float, Float>, minDistanceToPlayer: Float, viewportWidth: Float, viewportHeight: Float): Asteroid {
+	fun spawn(size: SIZE, playerPosition: Pair<Float, Float>, minDistanceToPlayer: Float, viewportWidth: Float, viewportHeight: Float): Asteroid {
+		return spawn(size, null, null, true, playerPosition, minDistanceToPlayer, viewportWidth, viewportHeight)
+	}
+
+
+	/**
+	 * Spawn a random asteroid of a given size at a given position and direction, with optional random speed
+	 */
+	fun spawn(size: SIZE, spawnPosition: Pair<Float, Float>?, direction: Float?, randomSpeed: Boolean, playerPosition: Pair<Float, Float>, minDistanceToPlayer: Float, viewportWidth: Float, viewportHeight: Float): Asteroid {
 		asteroidType = when (size) {
 			SIZE.LARGE -> AsteroidTypeLarge()
 			SIZE.MEDIUM -> AsteroidTypeMedium()
@@ -69,8 +77,11 @@ class Asteroid : SpaceObject {
 			this.direction = 360f * Math.random().toFloat()
 		}
 
-		speedX = asteroidType.speed() * cos(Math.toRadians(this.direction.toDouble())).toFloat()
-		speedY = asteroidType.speed() * sin(Math.toRadians(this.direction.toDouble())).toFloat()
+		val speedXRatio = if (randomSpeed) 0.15f + Math.random().toFloat() * 0.85f else 1f
+		val speedYRatio = if (randomSpeed) 0.15f + Math.random().toFloat() * 0.85f else 1f
+
+		speedX = speedXRatio * asteroidType.speed() * cos(Math.toRadians(this.direction.toDouble())).toFloat()
+		speedY = speedYRatio * asteroidType.speed() * sin(Math.toRadians(this.direction.toDouble())).toFloat()
 
 		moveDtMax = 10f / Settings.Gameplay.TARGET_IPS.toFloat()
 		turnStepMax = asteroidType.turnSpeed() / Settings.Gameplay.TARGET_IPS.toFloat()

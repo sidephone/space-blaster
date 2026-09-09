@@ -88,8 +88,6 @@ class AsteroidList {
 		repeat(numAsteroids) {
 			asteroids.add(Asteroid().spawn(
 				Asteroid.SIZE.LARGE,
-				null,
-				null,
 				player.position(),
 				player.minAsteroidSpawnDistance(),
 				viewportWidth,
@@ -99,7 +97,7 @@ class AsteroidList {
 	}
 
 
-	fun split(index: Int, player: Ship, viewportWidth: Float, viewportHeight: Float) {
+	fun split(index: Int, player: Ship, blastDirection: Float, randomizeSpeed: Boolean, viewportWidth: Float, viewportHeight: Float) {
 		val asteroid = asteroids.removeAt(index)
 
 		val newType = if (asteroid.isLarge()) {
@@ -111,12 +109,11 @@ class AsteroidList {
 		}
 
 		repeat(2) {
-			val newDirection = player.speedDirection() + (30f - 60f * Math.random().toFloat())
-
 			asteroids.add(Asteroid().spawn(
 				newType,
 				asteroid.position(),
-				newDirection,
+				blastDirection + (45f - 90f * Math.random().toFloat()),
+				randomizeSpeed,
 				player.position(),
 				player.minAsteroidSpawnDistance(),
 				viewportWidth,

@@ -332,11 +332,17 @@ class Gameplay(private val settings: Settings?) {
 		asteroidExplosion.spread(now)
 		asteroids.move(now, player, viewportWidth, viewportHeight)
 
-		val playerBulletHit = playerBullets.hitsTarget()
-		if (playerBulletHit >= 0) {
-			increaseScore(asteroids.score(playerBulletHit))
-			asteroidExplosion = ExplosionTypeAsteroid(now, asteroids.position(playerBulletHit))
-			asteroids.split(playerBulletHit, player, viewportWidth, viewportHeight)
+		if (playerBullets.hitTargetId() >= 0) {
+			increaseScore(asteroids.score(playerBullets.hitTargetId()))
+			asteroidExplosion = ExplosionTypeAsteroid(now, asteroids.position(playerBullets.hitTargetId()))
+			asteroids.split(
+				playerBullets.hitTargetId(),
+				player,
+				playerBullets.hittingBulletDirection(),
+				true,
+				viewportWidth,
+				viewportHeight
+			)
 		}
 
 		val crashedAsteroid = asteroids.oneCrashesWithPlayer()
@@ -347,7 +353,14 @@ class Gameplay(private val settings: Settings?) {
 			increaseScore(asteroids.score(crashedAsteroid))
 
 			asteroidExplosion = ExplosionTypeAsteroid(now, asteroids.position(crashedAsteroid))
-			asteroids.split(crashedAsteroid, player, viewportWidth, viewportHeight)
+			asteroids.split(
+				crashedAsteroid,
+				player,
+				player.speedDirection(),
+				false,
+				viewportWidth,
+				viewportHeight
+			)
 		}
 
 		startScheduledNextStage(now)

@@ -34,6 +34,7 @@ class Bullet(isEnemy: Boolean, private val canWrap: Boolean) {
 	private var lastMoveTime = 0L
 
 
+	fun direction() = direction
 	fun isIdle() = !isAirborne
 
 
