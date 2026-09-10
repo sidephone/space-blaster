@@ -59,8 +59,16 @@ class Asteroid : SpaceObject {
 		if (spawnPosition == null) {
 			var distanceToPlayer: Float
 			repeat(5) {
-				x = viewportWidth + AsteroidTypeLarge.RADIUS * 2f * Math.random().toFloat()
-				y = viewportHeight + AsteroidTypeLarge.RADIUS * 2f * Math.random().toFloat()
+				x = AsteroidTypeLarge.RADIUS * (1 + Math.random().toFloat())
+				if (Math.random() < 0.5) {
+					x += viewportWidth
+					this.direction = 135f + 90f * Math.random().toFloat()
+				} else {
+					x = -x
+					this.direction = 315f + 90f * Math.random().toFloat()
+				}
+
+				y = viewportHeight * Math.random().toFloat()
 				distanceToPlayer = sqrt((x - playerPosition.first) * (x - playerPosition.first) + (y - playerPosition.second) * (y - playerPosition.second))
 				if (distanceToPlayer >= minDistanceToPlayer) return@repeat
 			}
@@ -73,8 +81,6 @@ class Asteroid : SpaceObject {
 
 		if (direction != null) {
 			this.direction = direction
-		} else {
-			this.direction = 360f * Math.random().toFloat()
 		}
 
 		val speedXRatio = if (randomSpeed) 0.15f + Math.random().toFloat() * 0.85f else 1f

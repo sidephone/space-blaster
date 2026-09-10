@@ -2,7 +2,6 @@
 An Asteroids-style game for Sidephone.
 
 ## TODO
-- Make the asteroids come from left and right, instead of from the corners
 - Saucers
 - Settings screen
 - Sounds?
