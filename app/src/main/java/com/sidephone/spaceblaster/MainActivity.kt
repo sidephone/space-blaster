@@ -19,7 +19,7 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import com.sidephone.spaceblaster.engine.Gamepad
 import com.sidephone.spaceblaster.engine.Gameplay
-import com.sidephone.spaceblaster.screens.MainMenuScreen
+import com.sidephone.spaceblaster.screens.main.MainMenuScreen
 import com.sidephone.spaceblaster.screens.ScreenType
 import com.sidephone.spaceblaster.screens.SettingsScreen
 import com.sidephone.spaceblaster.screens.game.GameScreen
