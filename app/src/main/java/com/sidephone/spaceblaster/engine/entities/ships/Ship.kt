@@ -9,14 +9,13 @@ import kotlin.math.sin
 import kotlin.math.sqrt
 
 abstract class Ship : SpaceObject {
-
 	protected var shipType: ShipType = ShipTypeDefender()
 
 	protected var direction: Float = 0f // degrees, 0 is to the right, -90 is straight up
 	protected var x: Float = 0f // px, center of the ship
 	protected var y: Float = 0f // px, center of the ship
-	private var speedX = 0f
-	private var speedY = 0f
+	protected var speedX = 0f
+	protected var speedY = 0f
 	private var accelerationMax: Float = 1f
 	private var brakingMax: Float = 1f
 	private var moveDtMax: Float = 1f

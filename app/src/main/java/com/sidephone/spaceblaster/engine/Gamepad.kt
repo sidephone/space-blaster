@@ -16,7 +16,7 @@ class Gamepad {
 
 	fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {
 		if (hasKey(keyCode) && event?.repeatCount == 0) {
-			pressedKeys.add(normalizeKeyCode(keyCode))
+			pressedKeys.add(keyCode)
 			return true
 		}
 
@@ -26,7 +26,7 @@ class Gamepad {
 
 	fun onKeyUp(keyCode: Int): Boolean {
 		if (hasKey(keyCode)) {
-			pressedKeys.remove(normalizeKeyCode(keyCode))
+			pressedKeys.remove(keyCode)
 			return true
 		}
 
@@ -43,6 +43,7 @@ class Gamepad {
 		return when (keyCode) {
 			// QWERTY
 			KeyEvent.KEYCODE_SPACE,
+			KeyEvent.KEYCODE_DEL,
 			// gamepad
 			KeyEvent.KEYCODE_BUTTON_A,
 			KeyEvent.KEYCODE_BUTTON_B,
@@ -55,14 +56,6 @@ class Gamepad {
 			KeyEvent.KEYCODE_DPAD_LEFT,
 			KeyEvent.KEYCODE_DPAD_RIGHT -> true
 			else -> false
-		}
-	}
-
-
-	private fun normalizeKeyCode(keyCode: Int): Int {
-		return when (keyCode) {
-			KeyEvent.KEYCODE_SPACE -> KeyEvent.KEYCODE_BUTTON_A
-			else -> keyCode
 		}
 	}
 }
