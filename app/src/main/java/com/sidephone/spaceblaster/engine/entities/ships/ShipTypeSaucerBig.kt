@@ -2,13 +2,13 @@ package com.sidephone.spaceblaster.engine.entities.ships
 
 import com.sidephone.spaceblaster.engine.graphics.DrawCommand
 
-class ShipTypeSaucerBig : ShipType {
+open class ShipTypeSaucerBig : ShipType {
 	companion object {
-		const val MAX_SPEED = 125f // px/sec
-
+		const val AIM_ACCURACY = 0.0f // 0.0 = perfect aim, 1.0 = random aim
 		const val DRAW_DIRECTION = -90f // degrees, 0 is to the right, -90 is straight up
 		const val RADIUS = 35f
 		const val SIZE_UNIT = RADIUS / 30f
+		const val SPEED = 125f // px/sec
 
 		const val SCORE_POINTS = 5
 	}
@@ -41,7 +41,7 @@ class ShipTypeSaucerBig : ShipType {
 	override fun braking() = 0f
 	override fun cannonLength(): Float = RADIUS
 	override fun drawDirection() = DRAW_DIRECTION
-	override fun maxSpeed() = MAX_SPEED
+	override fun maxSpeed() = SPEED
 	override fun radius() = RADIUS
 	override fun turnSpeed() = 0f
 
@@ -51,7 +51,7 @@ class ShipTypeSaucerBig : ShipType {
 	}
 
 
-	private fun drawBody(): List<DrawCommand> {
+	protected open fun drawBody(): List<DrawCommand> {
 		return listOf(
 			// Bottom shadow / underside.
 			DrawCommand.Polygon(
@@ -213,7 +213,7 @@ class ShipTypeSaucerBig : ShipType {
 	}
 
 
-	private fun drawEngine(): List<DrawCommand> {
+	protected open fun drawEngine(): List<DrawCommand> {
 		return listOf<DrawCommand>(
 			DrawCommand.Arc(
 				cx = 0f,

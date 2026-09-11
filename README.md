@@ -4,8 +4,9 @@ An Asteroids-style game for Sidephone.
 ## TODO
 - Saucers
   - avoid asteroids
-  - small saucer design
-- Settings screen
+  - add a setting to disable saucers
+  - add a settings for bumping saucers
+- Settings screen + separate high scores for each setting set
 - Sounds?
 - Extra player ships?
 

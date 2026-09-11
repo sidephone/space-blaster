@@ -39,14 +39,19 @@ abstract class BulletList {
 			bullet.move(now, viewportWidth, viewportHeight)
 
 			for ((index, target) in targets.withIndex()) {
+				if (target.notBumpable(now)) {
+					continue
+				}
+
 				if (bullet.hits(target)) {
 					if (!bullet.isEnemy() && target is EnemyShip) {
-						hitEnemy = !target.isDead(now)
+						hitEnemy = true
 					} else if (bullet.isEnemy() && target is PlayerShip) {
-						hitPlayer = !target.isDead(now)
+						hitPlayer = true
 					} else {
 						hitAsteroidId = index
 					}
+
 					hittingBulletDirection = bullet.direction()
 					bullet.stop()
 					break

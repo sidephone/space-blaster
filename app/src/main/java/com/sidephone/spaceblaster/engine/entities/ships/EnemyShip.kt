@@ -22,13 +22,15 @@ class EnemyShip : Ship() {
 	fun aim(target: Pair<Float, Float>) {
 		if (isDead) return
 
-		if (shipType is ShipTypeSaucerBig) {
-			direction = 360 * Math.random().toFloat()
-		} else {
-			val (targetX, targetY) = target
-			direction = Math.toDegrees(atan2((targetY - y).toDouble(), (targetX - x).toDouble())).toFloat()
-			direction += (Math.random() * 20 - 10).toFloat() // add some random offset to make it less accurate
+		val (targetX, targetY) = target
+		direction = Math.toDegrees(atan2((targetY - y).toDouble(), (targetX - x).toDouble())).toFloat()
+
+		val accuracy = when (shipType) {
+			is ShipTypeSaucerSmall -> ShipTypeSaucerSmall.AIM_ACCURACY
+			is ShipTypeSaucerBig -> ShipTypeSaucerBig.AIM_ACCURACY
+			else -> 0f
 		}
+		direction += (Math.random() * 2 - 1).toFloat() * (1 - accuracy) * 180f
 	}
 
 
@@ -91,8 +93,7 @@ class EnemyShip : Ship() {
 
 	override fun spawn(now: Long, viewportWidth: Float, viewportHeight: Float) {
 		super.spawn(now, viewportWidth, viewportHeight)
-//		shipType = if ((0..1).random() == 0) ShipTypeSaucerBig() else ShipTypeSaucerSmall()
-		shipType = ShipTypeSaucerBig()
+		shipType = if ((0..1).random() == 0) ShipTypeSaucerBig() else ShipTypeSaucerSmall()
 
 		getEnemySpawnPosition(viewportWidth, viewportHeight, shipType.radius()).let { (spawnX, spawnY) ->
 			x = spawnX
@@ -101,8 +102,8 @@ class EnemyShip : Ship() {
 		isDead = false
 		nextDirectionChange = 0L
 		score = when (shipType) {
-			is ShipTypeSaucerBig -> ShipTypeSaucerBig.SCORE_POINTS
 			is ShipTypeSaucerSmall -> ShipTypeSaucerSmall.SCORE_POINTS
+			is ShipTypeSaucerBig -> ShipTypeSaucerBig.SCORE_POINTS
 			else -> 0
 		}
 	}
