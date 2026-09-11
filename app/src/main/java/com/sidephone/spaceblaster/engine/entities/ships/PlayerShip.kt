@@ -1,6 +1,7 @@
 package com.sidephone.spaceblaster.engine.entities.ships
 
 import com.sidephone.spaceblaster.engine.entities.HyperspaceJump
+import com.sidephone.spaceblaster.engine.entities.getPlayerSpawnPosition
 import com.sidephone.spaceblaster.engine.graphics.DrawCommandGroup
 import com.sidephone.spaceblaster.settings.Settings.Player.INVINCIBILITY_DURATION
 import com.sidephone.spaceblaster.settings.Settings.Player.RESPAWN_DELAY
@@ -134,6 +135,11 @@ class PlayerShip : Ship() {
 		if (isDeadForever.value) return
 
 		super.spawn(now, viewportWidth, viewportHeight)
+		getPlayerSpawnPosition(viewportWidth, viewportHeight).also{
+			x = it.x
+			y = it.y
+			direction = it.direction + shipType.drawDirection()
+		}
 		isInvincible = true
 		invincibilityTimeout = now + INVINCIBILITY_DURATION
 		lastDeathTime = 0L

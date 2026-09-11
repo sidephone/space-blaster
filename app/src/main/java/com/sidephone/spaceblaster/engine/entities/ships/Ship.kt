@@ -47,7 +47,6 @@ abstract class Ship : SpaceObject {
 		return Pair(cannonX, cannonY)
 	}
 	fun direction() = direction
-	fun minAsteroidSpawnDistance(): Float = shipType.radius() * 3f
 	fun speedDirection(): Float = Math.toDegrees(atan2(speedY.toDouble(), speedX.toDouble())).toFloat()
 
 
@@ -72,8 +71,6 @@ abstract class Ship : SpaceObject {
 		shipType = ShipTypeDefender()
 
 		direction = shipType.drawDirection()
-		x = viewportWidth / 2f
-		y = viewportHeight / 2f
 		speedX = 0f
 		speedY = 0f
 		accelerationMax = shipType.acceleration() / Settings.Gameplay.TARGET_IPS.toFloat()

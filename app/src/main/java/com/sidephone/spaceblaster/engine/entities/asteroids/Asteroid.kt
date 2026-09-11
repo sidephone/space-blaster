@@ -1,6 +1,7 @@
 package com.sidephone.spaceblaster.engine.entities.asteroids
 
 import com.sidephone.spaceblaster.engine.entities.SpaceObject
+import com.sidephone.spaceblaster.engine.entities.getEnemySpawnPositions
 import com.sidephone.spaceblaster.engine.graphics.DrawCommandGroup
 import com.sidephone.spaceblaster.settings.Settings
 import kotlin.math.cos
@@ -39,38 +40,30 @@ class Asteroid : SpaceObject {
 	/**
 	 * Spawn a random asteroid of a given size, not too close to the player
 	 */
-	fun spawn(size: SIZE, playerPosition: Pair<Float, Float>, minDistanceToPlayer: Float, viewportWidth: Float, viewportHeight: Float): Asteroid {
-		return spawn(size, null, null, true, playerPosition, minDistanceToPlayer, viewportWidth, viewportHeight)
+	fun spawn(size: SIZE, viewportWidth: Float, viewportHeight: Float): Asteroid {
+		return spawn(size, null, null, true, viewportWidth, viewportHeight)
 	}
 
 
 	/**
 	 * Spawn a random asteroid of a given size at a given position and direction, with optional random speed
 	 */
-	fun spawn(size: SIZE, spawnPosition: Pair<Float, Float>?, direction: Float?, randomSpeed: Boolean, playerPosition: Pair<Float, Float>, minDistanceToPlayer: Float, viewportWidth: Float, viewportHeight: Float): Asteroid {
+	fun spawn(size: SIZE, spawnPosition: Pair<Float, Float>?, direction: Float?, randomSpeed: Boolean, viewportWidth: Float, viewportHeight: Float): Asteroid {
 		asteroidType = when (size) {
 			SIZE.LARGE -> AsteroidTypeLarge()
 			SIZE.MEDIUM -> AsteroidTypeMedium()
 			SIZE.SMALL -> AsteroidTypeSmall()
 		}
 
-		// if no position is provided, spawn the asteroid at a random position outside the viewport, but
-		// not too close to the player
-		if (spawnPosition == null) {
-			var distanceToPlayer: Float
-			repeat(5) {
-				x = AsteroidTypeLarge.RADIUS * (1 + Math.random().toFloat())
-				if (Math.random() < 0.5) {
-					x += viewportWidth
-					this.direction = 135f + 90f * Math.random().toFloat()
-				} else {
-					x = -x
-					this.direction = 315f + 90f * Math.random().toFloat()
-				}
+		this.direction = (Math.random() * 360f).toFloat()
 
-				y = viewportHeight * Math.random().toFloat()
-				distanceToPlayer = sqrt((x - playerPosition.first) * (x - playerPosition.first) + (y - playerPosition.second) * (y - playerPosition.second))
-				if (distanceToPlayer >= minDistanceToPlayer) return@repeat
+		// if no position is provided, spawn the asteroid at a random position outside the viewport, and
+		// let it creep in slowly
+		if (spawnPosition == null) {
+			getEnemySpawnPositions(viewportWidth, viewportHeight, asteroidType.radius()).also {
+				x = it.x
+				y = it.y
+				this.direction = it.direction
 			}
 		}
 		// if a position is provided (e.g. when splitting an asteroid), use that position
