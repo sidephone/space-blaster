@@ -3,6 +3,8 @@ An Asteroids-style game for Sidephone.
 
 ## TODO
 - Saucers
+  - avoid asteroids
+  - small saucer design
 - Settings screen
 - Sounds?
 - Extra player ships?

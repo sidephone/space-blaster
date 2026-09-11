@@ -1,18 +1,22 @@
 package com.sidephone.spaceblaster.engine.entities.bullets
 
 import com.sidephone.spaceblaster.engine.entities.SpaceObject
+import com.sidephone.spaceblaster.engine.entities.ships.EnemyShip
+import com.sidephone.spaceblaster.engine.entities.ships.PlayerShip
 import com.sidephone.spaceblaster.engine.graphics.DrawCommandGroup
 import com.sidephone.spaceblaster.settings.Settings
 
 abstract class BulletList {
 	protected var bullets = mutableListOf<Bullet>()
-	private var hitTargetId = -1
+	private var hitAsteroidId = -1
+	private var hitEnemy = false
+	private var hitPlayer = false
 	private var hittingBulletDirection = 0f
 	private var lastShootTime = 0L
 
 
 	abstract fun resetBullets(settings: Settings?, stage: Int)
-	abstract fun shootDelay(): Long
+	abstract fun shootDelay(now: Long): Long
 
 
 	fun draw(): List<DrawCommandGroup> {
@@ -20,19 +24,29 @@ abstract class BulletList {
 	}
 
 
-	fun hitTargetId() = hitTargetId
+	fun hitAsteroidId() = hitAsteroidId
+	fun hitEnemy() = hitEnemy
+	fun hitPlayer() = hitPlayer
 	fun hittingBulletDirection() = hittingBulletDirection
 
 
 	fun move(now: Long, targets: List<SpaceObject>, viewportWidth: Float, viewportHeight: Float) {
-		hitTargetId = -1
+		hitAsteroidId = -1
+		hitEnemy = false
+		hitPlayer = false
 
 		for (bullet in bullets) {
 			bullet.move(now, viewportWidth, viewportHeight)
 
 			for ((index, target) in targets.withIndex()) {
 				if (bullet.hits(target)) {
-					hitTargetId = index
+					if (!bullet.isEnemy() && target is EnemyShip) {
+						hitEnemy = !target.isDead(now)
+					} else if (bullet.isEnemy() && target is PlayerShip) {
+						hitPlayer = !target.isDead(now)
+					} else {
+						hitAsteroidId = index
+					}
 					hittingBulletDirection = bullet.direction()
 					bullet.stop()
 					break
@@ -43,7 +57,7 @@ abstract class BulletList {
 
 
 	fun reset(settings: Settings?, stage: Int) {
-		hitTargetId = -1
+		hitAsteroidId = -1
 		resetBullets(settings, stage)
 	}
 
@@ -54,7 +68,7 @@ abstract class BulletList {
 
 
 	fun shoot(now: Long, fromPosition: Pair<Float, Float>, direction: Float) {
-		if (now - lastShootTime < shootDelay()) {
+		if (now - lastShootTime < shootDelay(now)) {
 			return
 		}
 

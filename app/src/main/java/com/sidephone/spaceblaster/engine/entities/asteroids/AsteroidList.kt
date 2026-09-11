@@ -10,6 +10,7 @@ class AsteroidList {
 	private val asteroids: MutableList<Asteroid> = mutableListOf()
 
 	private var bumpAsteroids = false
+	private var bumpsWithEnemy: Int = -1
 	private var bumpsWithPlayer: Int = -1
 
 
@@ -19,6 +20,9 @@ class AsteroidList {
 	fun clear() {
 		asteroids.clear()
 	}
+
+
+	fun count() = asteroids.size
 
 
 	fun draw(): List<DrawCommandGroup> {
@@ -31,11 +35,14 @@ class AsteroidList {
 	}
 
 
-	fun move(now: Long, player: Ship, viewportWidth: Float, viewportHeight: Float) {
+	fun move(now: Long, player: Ship, enemy: Ship, viewportWidth: Float, viewportHeight: Float) {
+		bumpsWithEnemy = -1
 		bumpsWithPlayer = -1
 
 		for ((i, asteroid) in asteroids.withIndex()) {
-			if (asteroid.shouldBump(now, player)) {
+			if (asteroid.shouldBump(now, enemy)) {
+				bumpsWithEnemy = i
+			} else if (asteroid.shouldBump(now, player)) {
 				bumpsWithPlayer = i
 			} else if (bumpAsteroids) {
 				for (otherIndex in i + 1 until asteroids.size) {
@@ -47,6 +54,11 @@ class AsteroidList {
 
 			asteroid.move(now, viewportWidth, viewportHeight)
 		}
+	}
+
+
+	fun oneCrashesWithEnemy(): Int {
+		return bumpsWithEnemy
 	}
 
 

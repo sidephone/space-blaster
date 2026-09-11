@@ -31,7 +31,6 @@ abstract class Ship : SpaceObject {
 	abstract fun die(now: Long)
 	abstract fun draw(now: Long): DrawCommandGroup
 	abstract fun isDead(now: Long): Boolean
-	abstract fun resetLives()
 
 
 	override fun notBumpable(now: Long): Boolean = isDead(now)
@@ -68,9 +67,9 @@ abstract class Ship : SpaceObject {
 
 
 	open fun spawn(now: Long, viewportWidth: Float, viewportHeight: Float) {
-		shipType = ShipTypeDefender()
-
-		direction = shipType.drawDirection()
+		x = 0f
+		y = 0f
+		direction = 0f
 		speedX = 0f
 		speedY = 0f
 		accelerationMax = shipType.acceleration() / Settings.Gameplay.TARGET_IPS.toFloat()
