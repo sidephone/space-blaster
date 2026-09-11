@@ -66,6 +66,11 @@ abstract class Ship : SpaceObject {
 	}
 
 
+	fun shouldBump(now: Long, other: SpaceObject): Boolean {
+		return super.shouldBump(now, speedX, speedY, other)
+	}
+
+
 	open fun spawn(now: Long, viewportWidth: Float, viewportHeight: Float) {
 		x = 0f
 		y = 0f

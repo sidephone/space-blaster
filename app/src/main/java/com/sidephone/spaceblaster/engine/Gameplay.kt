@@ -406,6 +406,12 @@ class Gameplay(private val settings: Settings?) {
 			crashShip(now, player)
 		}
 
+		if (player.shouldBump(now, enemy)) {
+			increaseScore(enemy.score())
+			crashShip(now, player)
+			crashShip(now, enemy)
+		}
+
 		startScheduledNextStage(now)
 
 		if (asteroids.isEmpty() && !player.isDead(now) && enemy.isDead(now)) {
