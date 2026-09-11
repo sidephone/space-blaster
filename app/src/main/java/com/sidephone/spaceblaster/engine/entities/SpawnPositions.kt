@@ -8,7 +8,7 @@ data class SpawnPosition(val x: Float, val y: Float, val direction: Float)
  * The enemy will spawn outside the viewport, either to the left or right, and will move towards the
  * center of the viewport.
  */
-fun getEnemySpawnPositions(viewportWidth: Float, viewportHeight: Float, enemyRadius: Float): SpawnPosition {
+fun getEnemySpawnPosition(viewportWidth: Float, viewportHeight: Float, enemyRadius: Float): SpawnPosition {
 	var x: Float
 	var direction: Float
 
