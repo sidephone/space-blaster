@@ -353,7 +353,6 @@ class Gameplay(private val settings: Settings?) {
 			asteroidExplosion = ExplosionTypeAsteroid(now, asteroids.position(playerBullets.hitTargetId()))
 			asteroids.split(
 				playerBullets.hitTargetId(),
-				player,
 				playerBullets.hittingBulletDirection(),
 				true,
 				viewportWidth,
@@ -371,7 +370,6 @@ class Gameplay(private val settings: Settings?) {
 			asteroidExplosion = ExplosionTypeAsteroid(now, asteroids.position(crashedAsteroid))
 			asteroids.split(
 				crashedAsteroid,
-				player,
 				player.speedDirection(),
 				false,
 				viewportWidth,
@@ -424,7 +422,6 @@ class Gameplay(private val settings: Settings?) {
 		asteroids.spawn(
 			settings?.getAsteroidsBump() == true,
 			stage,
-			player,
 			viewportWidth,
 			viewportHeight
 		)
