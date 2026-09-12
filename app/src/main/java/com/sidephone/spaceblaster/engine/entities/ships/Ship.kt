@@ -22,7 +22,7 @@ abstract class Ship : SpaceObject {
 	private var turnStepMax: Float = 1f
 
 	private var lastThrustTime = 0L // ms
-	private var lastMoveTime = 0L // ms
+	protected var lastMoveTime = 0L // ms
 	private var lastTurnTime = 0L // ms
 
 	protected var isThrusting = false
@@ -38,6 +38,10 @@ abstract class Ship : SpaceObject {
 	override fun radius(): Float = shipType.radius()
 	override fun speed(): Pair<Float, Float> = Pair(speedX, speedY)
 
+	fun direction() = direction
+	fun speedDirection(): Float = Math.toDegrees(atan2(speedY.toDouble(), speedX.toDouble())).toFloat()
+
+
 	fun cannonPosition(): Pair<Float, Float> {
 		val angle = Math.toRadians(direction.toDouble())
 		val length = shipType.cannonLength()
@@ -45,16 +49,12 @@ abstract class Ship : SpaceObject {
 		val cannonY = y + (length * sin(angle)).toFloat()
 		return Pair(cannonX, cannonY)
 	}
-	fun direction() = direction
-	fun speedDirection(): Float = Math.toDegrees(atan2(speedY.toDouble(), speedX.toDouble())).toFloat()
 
 
 	fun move(now: Long, viewportWidth: Float, viewportHeight: Float) {
 		if (isDead(now)) return
 
 		val dt = ((now - lastMoveTime) / 1000f).coerceAtMost(moveDtMax)
-		lastMoveTime = now
-
 		val dx = speedX * dt
 		val dy = speedY * dt
 
@@ -66,6 +66,8 @@ abstract class Ship : SpaceObject {
 		if (y < 0 && dy < 0) y = viewportHeight
 		if (x > viewportWidth && dx > 0) x = 0f
 		if (y > viewportHeight && dy > 0) y = 0f
+
+		lastMoveTime = now
 	}
 
 

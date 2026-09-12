@@ -422,7 +422,7 @@ class Gameplay(private val settings: Settings?) {
 			enemyBullets.resetShootTime(now)
 		}
 		enemy.aim(viewportWidth, viewportHeight,player.position(), player.radius())
-		enemy.moveAtWill(now, viewportWidth, viewportHeight)
+		enemy.moveAtWill(now, asteroids.getAll(), viewportWidth, viewportHeight)
 		enemyExplosion.spread(now)
 		enemyBullets.move(now, viewportWidth, viewportHeight)
 
