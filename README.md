@@ -4,8 +4,6 @@ An Asteroids-style game for Sidephone.
 ## TODO
 - Saucers
   - avoid asteroids
-  - do not appear or shoot during the countdown
-  - do not shoot when distance from the screen edges <= radius * 1.1
   - fine tune the number of asteroids
   - add a setting to disable saucers
   - add a setting for bumping saucers

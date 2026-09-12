@@ -106,6 +106,14 @@ class EnemyShip : Ship() {
 	}
 
 
+	fun isOnScreen(viewportWidth: Float, viewportHeight: Float): Boolean {
+		return x >= -shipType.radius()
+			&& x <= viewportWidth + shipType.radius()
+			&& y >= -shipType.radius()
+			&& y <= viewportHeight + shipType.radius()
+	}
+
+
 	fun isTimeToSpawn(stage: Int, stageTime: Long, asteroidCount: Int): Boolean {
 		return asteroidCount in SPAWN_WHEN_MIN_ASTEROIDS..SPAWN_WHEN_MAX_ASTEROIDS
 			&& isDead
@@ -147,10 +155,12 @@ class EnemyShip : Ship() {
 	}
 
 
-	fun spawnIfNeeded(now: Long, stage: Int, stageTime: Long, asteroidCount: Int, viewportWidth: Float, viewportHeight: Float) {
+	fun spawnIfNeeded(now: Long, stage: Int, stageTime: Long, asteroidCount: Int, viewportWidth: Float, viewportHeight: Float): Boolean {
 		if (isTimeToSpawn(stage, stageTime, asteroidCount)) {
 			spawn(now, viewportWidth, viewportHeight)
 			lastStage = stage
+			return true
 		}
+		return false
 	}
 }

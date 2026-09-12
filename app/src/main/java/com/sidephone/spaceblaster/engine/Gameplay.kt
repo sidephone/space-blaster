@@ -394,7 +394,7 @@ class Gameplay(private val settings: Settings?) {
 		if ((KeyEvent.KEYCODE_BUTTON_B in keys || KeyEvent.KEYCODE_SPACE in keys) && !player.isDead(now)) {
 			playerBullets.shoot(now, player.cannonPosition(), player.direction())
 		} else {
-			playerBullets.resetShootTime()
+			playerBullets.resetShootTime(0L)
 		}
 
 		if (KeyEvent.KEYCODE_BUTTON_Y in keys || KeyEvent.KEYCODE_DEL in keys) {
@@ -418,12 +418,16 @@ class Gameplay(private val settings: Settings?) {
 		playerExplosion.spread(now)
 		playerBullets.move(now, viewportWidth, viewportHeight)
 
-		enemy.spawnIfNeeded(now, stage, now - currentStageStartTime, asteroids.count(), viewportWidth, viewportHeight)
+		if (enemy.spawnIfNeeded(now, stage, now - currentStageStartTime, asteroids.count(), viewportWidth, viewportHeight)) {
+			enemyBullets.resetShootTime(now)
+		}
 		enemy.aim(viewportWidth, viewportHeight,player.position(), player.radius())
 		enemy.moveAtWill(now, viewportWidth, viewportHeight)
 		enemyExplosion.spread(now)
 		enemyBullets.move(now, viewportWidth, viewportHeight)
-		if (!enemy.isDead(now)) {
+
+		// shoot if: no countdown && enemy is alive && enemy is on screen
+		if (nextStageStartTime < now && !enemy.isDead(now) && enemy.isOnScreen(viewportWidth, viewportHeight)) {
 			enemyBullets.shoot(now, enemy.cannonPosition(), enemy.direction())
 		}
 

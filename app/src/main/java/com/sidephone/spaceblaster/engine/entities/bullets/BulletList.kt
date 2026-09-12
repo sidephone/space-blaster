@@ -9,7 +9,7 @@ import com.sidephone.spaceblaster.settings.Settings
 abstract class BulletList {
 	protected var bullets = mutableListOf<Bullet>()
 	private var hittingBulletDirection = 0f
-	private var lastShootTime = 0L
+	protected var lastShootTime = 0L
 
 
 	abstract fun resetBullets(settings: Settings?, stage: Int)
@@ -19,7 +19,7 @@ abstract class BulletList {
 	fun draw() = bullets.filterNot { it.isIdle() }.map { it.draw() }
 	fun hittingBulletDirection() = hittingBulletDirection
 	fun reset(settings: Settings?, stage: Int) { resetBullets(settings, stage) }
-	fun resetShootTime() { lastShootTime = 0L }
+	fun resetShootTime(now: Long) { lastShootTime = now }
 
 
 	fun hit(now: Long, target: SpaceObject): Boolean {
