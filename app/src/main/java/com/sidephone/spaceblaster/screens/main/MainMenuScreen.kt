@@ -63,11 +63,14 @@ fun MainMenuScreen(
 			)
 		}
 
-		MenuButton(
-			onClick = onSettings,
-			modifier = Modifier.gamepadClickableButton(onSettings),
-			text = R.string.main_settings
-		)
+		if (!isGamePaused) {
+			MenuButton(
+				onClick = onSettings,
+				modifier = Modifier.gamepadClickableButton(onSettings),
+				text = R.string.main_settings
+			)
+		}
+
 		MenuButton(
 			onClick = onExit,
 			modifier = Modifier.gamepadClickableButton(onExit),

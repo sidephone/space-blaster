@@ -13,4 +13,8 @@ object Dimens {
 	val MainMenuButtonPaddingHorizontal = 24.dp
 
 	val HudPadding = 5.dp
+
+	val SettingsPreferenceWrapper = 0.dp
+	val SettingsPreferencePadding = 12.dp
+	val SettingsPreferenceSwitchPadding = 6.dp
 }
