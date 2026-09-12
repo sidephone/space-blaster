@@ -3,6 +3,7 @@ package com.sidephone.spaceblaster.engine.entities.ships
 import com.sidephone.spaceblaster.engine.entities.asteroids.Asteroid
 import com.sidephone.spaceblaster.engine.entities.getEnemySpawnPosition
 import com.sidephone.spaceblaster.engine.graphics.DrawCommandGroup
+import com.sidephone.spaceblaster.settings.Settings.Saucer.AVOID_ASTEROID_CHANCE
 import com.sidephone.spaceblaster.settings.Settings.Saucer.AVOID_ASTEROID_DISTANCE
 import com.sidephone.spaceblaster.settings.Settings.Saucer.AVOID_ASTEROID_RETRIES
 import com.sidephone.spaceblaster.settings.Settings.Saucer.FLY_TIME_MAX
@@ -114,7 +115,7 @@ class EnemyShip : Ship() {
 	}
 
 
-	private fun isDangerouslyApproachingAsteroid(now: Long, oldX: Float, oldY: Float, asteroids: List<Asteroid>): Boolean {
+	private fun isDangerouslyApproachingAsteroid(oldX: Float, oldY: Float, asteroids: List<Asteroid>): Boolean {
 		for (asteroid in asteroids) {
 			val dx = oldX - asteroid.position().first
 			val dy = oldY - asteroid.position().second
@@ -155,16 +156,19 @@ class EnemyShip : Ship() {
 		val oldX = x
 		val oldY = y
 		val previousLastMoveTime = lastMoveTime
-		var retries = AVOID_ASTEROID_RETRIES
+		val avoidAsteroids = Math.random() < AVOID_ASTEROID_CHANCE
+		var retries = if (avoidAsteroids) AVOID_ASTEROID_RETRIES else 1
+		var runAway = false
 
 		while (retries-- > 0) {
-			calculateNextMove(now, retries < AVOID_ASTEROID_RETRIES - 1)
+			calculateNextMove(now, runAway)
 			move(now, viewportWidth, viewportHeight)
-			if (isDangerouslyApproachingAsteroid(now, oldX, oldY, asteroids)) {
+			if (isDangerouslyApproachingAsteroid(oldX, oldY, asteroids)) {
 				nextDirectionChange = now
 				x = oldX
 				y = oldY
 				lastMoveTime = previousLastMoveTime
+				runAway = true
 			} else {
 				break
 			}

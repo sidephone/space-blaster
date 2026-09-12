@@ -44,8 +44,9 @@ class Settings(context: android.content.Context) {
 		const val SHOOT_DELAY_MIN = 1000L // ms
 		const val SHOOT_DELAY_MAX = 2500L // ms
 
+		const val AVOID_ASTEROID_CHANCE = 0.5f // 1 = always avoid, 0 = always ignore
 		const val AVOID_ASTEROID_DISTANCE = 1.5f // ship radii
-		const val AVOID_ASTEROID_RETRIES = 20
+		const val AVOID_ASTEROID_RETRIES = 5
 
 		const val FLY_TIME_MIN = 400L // ms
 		const val FLY_TIME_MAX = 1650L // ms
