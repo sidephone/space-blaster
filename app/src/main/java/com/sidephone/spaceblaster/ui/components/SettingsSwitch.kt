@@ -28,6 +28,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import com.sidephone.spaceblaster.ui.modifiers.gamepadClickableButton
 import com.sidephone.spaceblaster.ui.theme.Dimens
+import com.sidephone.spaceblaster.ui.theme.DisabledAlpha
 
 
 @Composable
@@ -78,7 +79,7 @@ fun SettingsSwitch(titleResId: Int, summaryOnResId: Int, summaryOffResId: Int, v
 				Text(
 					text = stringResource(titleResId),
 					style = typography.titleLarge,
-					color = if (disabled) colorScheme.onBackground.copy(alpha = 0.38f)
+					color = if (disabled) colorScheme.onBackground.copy(alpha = DisabledAlpha)
 					else if (isFocused) colorScheme.onSecondary
 					else colorScheme.onBackground,
 				)
@@ -88,7 +89,7 @@ fun SettingsSwitch(titleResId: Int, summaryOnResId: Int, summaryOffResId: Int, v
 						else summaryOffResId
 					),
 					style = typography.titleMedium,
-					color = if (disabled) colorScheme.onSurfaceVariant.copy(alpha = 0.38f)
+					color = if (disabled) colorScheme.onSurfaceVariant.copy(alpha = DisabledAlpha)
 					else if (isFocused) colorScheme.onSecondary
 					else colorScheme.onSurfaceVariant
 				)
