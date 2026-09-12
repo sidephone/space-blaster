@@ -76,15 +76,19 @@ class EnemyShip : Ship() {
 		isThrusting = !isThrusting
 
 		if (isThrusting) {
-			val angle = 360 * Math.random()
-			speedX = (shipType.maxSpeed() * cos(angle)).toFloat()
-			speedY = (shipType.maxSpeed() * sin(angle)).toFloat()
+			calculateSpeed(2 * Math.PI * Math.random())
 			nextDirectionChange = now + (FLY_TIME_MIN..FLY_TIME_MAX).random()
 		} else {
 			speedX = 0f
 			speedY = 0f
 			nextDirectionChange = now + (STILL_TIME_MIN..STILL_TIME_MAX).random()
 		}
+	}
+
+
+	private fun calculateSpeed(angle: Double) {
+		speedX = (shipType.maxSpeed() * cos(angle)).toFloat()
+		speedY = (shipType.maxSpeed() * sin(angle)).toFloat()
 	}
 
 
@@ -143,10 +147,11 @@ class EnemyShip : Ship() {
 		getEnemySpawnPosition(viewportWidth, viewportHeight, shipType.radius()).let { (spawnX, spawnY, spawnDirection) ->
 			x = spawnX
 			y = spawnY
-			direction = spawnDirection
+			calculateSpeed(Math.toRadians(spawnDirection.toDouble()))
 		}
 		isDead = false
-		nextDirectionChange = 0L
+		isThrusting = true
+		nextDirectionChange = now + FLY_TIME_MIN
 		score = when (shipType) {
 			is ShipTypeSaucerSmall -> ShipTypeSaucerSmall.SCORE_POINTS
 			is ShipTypeSaucerBig -> ShipTypeSaucerBig.SCORE_POINTS

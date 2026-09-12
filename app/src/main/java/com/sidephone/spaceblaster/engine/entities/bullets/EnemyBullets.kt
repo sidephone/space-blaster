@@ -17,12 +17,6 @@ class EnemyBullets : BulletList() {
 	}
 
 	override fun shootDelay(now: Long): Long {
-		// first shoot is always after a while
-		if (now - lastShootTime > SHOOT_DELAY_MAX) {
-			shootDelay = SHOOT_DELAY_MAX
-		}
-
-		// subsequent shoots are randomized between min and max shoot delay
 		if (now >= nextShootDelayRecalculate) {
 			shootDelay = (SHOOT_DELAY_MIN..SHOOT_DELAY_MAX).random()
 			nextShootDelayRecalculate = now + shootDelay

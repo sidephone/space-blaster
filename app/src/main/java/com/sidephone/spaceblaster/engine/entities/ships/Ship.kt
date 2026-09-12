@@ -55,14 +55,17 @@ abstract class Ship : SpaceObject {
 		val dt = ((now - lastMoveTime) / 1000f).coerceAtMost(moveDtMax)
 		lastMoveTime = now
 
-		x += speedX * dt
-		y += speedY * dt
+		val dx = speedX * dt
+		val dy = speedY * dt
+
+		x += dx
+		y += dy
 
 		// wrap around the screen edges
-		if (x < 0) x = viewportWidth
-		if (y < 0) y = viewportHeight
-		if (x > viewportWidth) x = 0f
-		if (y > viewportHeight) y = 0f
+		if (x < 0 && dx < 0) x = viewportWidth
+		if (y < 0 && dy < 0) y = viewportHeight
+		if (x > viewportWidth && dx > 0) x = 0f
+		if (y > viewportHeight && dy > 0) y = 0f
 	}
 
 
