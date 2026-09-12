@@ -81,6 +81,7 @@ class Gameplay(private val settings: Settings?) {
 	@Volatile private var stage = 0
 	@Volatile private var jumpKeyDown = false
 
+	private var enemiesAllowed = true
 	private var enemiesCrashInAsteroids = true
 
 
@@ -107,6 +108,7 @@ class Gameplay(private val settings: Settings?) {
 		nextStageStartTime = 0
 		scheduleNextStage(System.currentTimeMillis())
 
+		enemiesAllowed = settings?.getEnemiesAllowed() ?: true
 		enemiesCrashInAsteroids = settings?.getEnemiesCrashInAsteroids() ?: true
 
 		if (!isGameThreadAlive()) {
@@ -426,7 +428,7 @@ class Gameplay(private val settings: Settings?) {
 		playerBullets.move(now, viewportWidth, viewportHeight)
 		playerExplosion.spread(now)
 
-		if (enemy.spawnIfNeeded(now, stage, now - currentStageStartTime, asteroids.count(), viewportWidth, viewportHeight)) {
+		if (enemiesAllowed && enemy.spawnIfNeeded(now, stage, now - currentStageStartTime, asteroids.count(), viewportWidth, viewportHeight)) {
 			enemyBullets.resetShootTime(now)
 		}
 		enemy.aim(viewportWidth, viewportHeight,player.position(), player.radius())

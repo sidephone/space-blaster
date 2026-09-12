@@ -8,8 +8,9 @@ class Settings(context: android.content.Context) {
 		private const val PREFS_NAME = "SpaceBlasterSettings"
 		private const val ASTEROIDS_BUMP_KEY = "asteroids_bump"
 		private const val BULLETS_WRAP_AROUND_KEY = "bullets_wrap_around"
+		private const val ENEMIES_ALLOWED = "enemies_allowed"
 		private const val ENEMIES_CRASH_IN_ASTEROIDS = "enemies_crash_in_asteroids"
-		private const val HIGH_SCORE_KEY = "high_score"
+		private const val HIGH_SCORE_KEY = "hs"
 	}
 
 	object Asteroids {
@@ -72,21 +73,33 @@ class Settings(context: android.content.Context) {
 		return sharedPreferences.getBoolean(BULLETS_WRAP_AROUND_KEY, true)
 	}
 
+	fun getEnemiesAllowed(): Boolean {
+		return sharedPreferences.getBoolean(ENEMIES_ALLOWED, true)
+	}
+
 	fun getEnemiesCrashInAsteroids(): Boolean {
-		return sharedPreferences.getBoolean(ENEMIES_CRASH_IN_ASTEROIDS, true)
+		return getEnemiesAllowed() && sharedPreferences.getBoolean(ENEMIES_CRASH_IN_ASTEROIDS, true)
 	}
 
 	fun getHighScore(): Int {
-		return sharedPreferences.getInt(HIGH_SCORE_KEY, 0)
+		return sharedPreferences.getInt(getHighScoreKey(), 0)
 	}
 
 	fun updateHighScoreIfNeeded(newScore: Int): Boolean {
 		val currentHighScore = getHighScore()
 		if (newScore > currentHighScore) {
-			sharedPreferences.edit { putInt(HIGH_SCORE_KEY, newScore) }
+			sharedPreferences.edit { putInt(getHighScoreKey(), newScore) }
 			return true
 		}
 
 		return false
+	}
+
+	private fun getHighScoreKey(): String {
+		return HIGH_SCORE_KEY +
+			ASTEROIDS_BUMP_KEY + getAsteroidsBump() +
+			BULLETS_WRAP_AROUND_KEY + getBulletsWrapAround() +
+			ENEMIES_ALLOWED + getEnemiesAllowed() +
+			ENEMIES_CRASH_IN_ASTEROIDS + getEnemiesCrashInAsteroids()
 	}
 }
