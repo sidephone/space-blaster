@@ -3,6 +3,10 @@ package com.sidephone.spaceblaster.ui.theme
 import androidx.compose.ui.unit.dp
 
 object Dimens {
+	val ControlsKeypadTitlePaddingBottom = 24.dp
+	val ControlsListPaddingHorizontal = 3.dp
+	val ControlsListPaddingBottom = 24.dp
+
 	val MainMenuTitlePaddingTop = 12.dp
 	val MainMenuTitlePaddingHorizontal = 12.dp
 	val MainMenuTitlePaddingBottom = 32.dp

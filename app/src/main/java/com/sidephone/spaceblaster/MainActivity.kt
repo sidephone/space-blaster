@@ -19,6 +19,7 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import com.sidephone.spaceblaster.engine.Gamepad
 import com.sidephone.spaceblaster.engine.Gameplay
+import com.sidephone.spaceblaster.screens.controls.ControlsScreen
 import com.sidephone.spaceblaster.screens.main.MainMenuScreen
 import com.sidephone.spaceblaster.screens.ScreenType
 import com.sidephone.spaceblaster.screens.SettingsScreen
@@ -61,6 +62,7 @@ class MainActivity : ComponentActivity() {
 					when (currentScreen) {
 						ScreenType.Menu -> MainMenuScreen(
 							isGamePaused = isGamePaused,
+							onControls = { currentScreen = ScreenType.Controls },
 							onSettings = { currentScreen = ScreenType.Settings },
 							onExit = { finish() },
 							onEndGame = {
@@ -93,6 +95,7 @@ class MainActivity : ComponentActivity() {
 						// See: https://slack-chats.kotlinlang.org/t/12312231/funky-issue-i-ve-got-i-m-using-androidview-with-a-surfacevie
 						// See: https://issuetracker.google.com/issues/285718058
 						}
+						ScreenType.Controls -> ControlsScreen { currentScreen = ScreenType.Menu }
 						ScreenType.Settings -> SettingsScreen(settings) { currentScreen = ScreenType.Menu }
 					}
 				}

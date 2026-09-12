@@ -1,5 +1,5 @@
 package com.sidephone.spaceblaster.screens
 
 enum class ScreenType {
-	Menu, Game, Settings
+	Menu, Game, Settings, Controls
 }

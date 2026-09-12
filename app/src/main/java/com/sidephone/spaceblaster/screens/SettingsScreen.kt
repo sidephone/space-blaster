@@ -14,7 +14,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import com.sidephone.snake.ui.components.MenuTitle
+import com.sidephone.spaceblaster.ui.components.MenuTitle
 import com.sidephone.spaceblaster.R
 import com.sidephone.spaceblaster.settings.Settings
 import com.sidephone.spaceblaster.ui.components.BackToMainButton
