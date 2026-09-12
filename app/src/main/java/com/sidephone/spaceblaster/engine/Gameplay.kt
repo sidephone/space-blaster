@@ -412,27 +412,26 @@ class Gameplay(private val settings: Settings?) {
 
 	@WorkerThread
 	private fun runLogic(now: Long) {
+		asteroids.move(now, viewportWidth, viewportHeight)
+		asteroidExplosion.spread(now)
+
 		player.autoSpawnAfterDeath(now, viewportWidth, viewportHeight)
 		player.revokeInvincibilityWhenExpired(now)
 		player.move(now, viewportWidth, viewportHeight)
-		playerExplosion.spread(now)
 		playerBullets.move(now, viewportWidth, viewportHeight)
+		playerExplosion.spread(now)
 
 		if (enemy.spawnIfNeeded(now, stage, now - currentStageStartTime, asteroids.count(), viewportWidth, viewportHeight)) {
 			enemyBullets.resetShootTime(now)
 		}
 		enemy.aim(viewportWidth, viewportHeight,player.position(), player.radius())
-		enemy.moveAtWill(now, viewportWidth, viewportHeight)
-		enemyExplosion.spread(now)
+		enemy.moveAtWill(now, asteroids.getAll(), viewportWidth, viewportHeight)
 		enemyBullets.move(now, viewportWidth, viewportHeight)
-
-		// shoot if: no countdown && enemy is alive && enemy is on screen
 		if (nextStageStartTime < now && !enemy.isDead(now) && enemy.isOnScreen(viewportWidth, viewportHeight)) {
+			// shoot if: no countdown && enemy is alive && enemy is on screen
 			enemyBullets.shoot(now, enemy.cannonPosition(), enemy.direction())
 		}
-
-		asteroidExplosion.spread(now)
-		asteroids.move(now, viewportWidth, viewportHeight)
+		enemyExplosion.spread(now)
 
 		checkPlayerBulletsHit(now)
 		checkEnemyBulletsHit(now)

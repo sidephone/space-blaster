@@ -3,8 +3,6 @@ An Asteroids-style game for Sidephone.
 
 ## TODO
 - Saucers
-  - avoid asteroids
-  - fine tune the number of asteroids
   - add a setting to disable saucers
   - add a setting for bumping saucers
 - Settings screen + separate high scores for each setting set
