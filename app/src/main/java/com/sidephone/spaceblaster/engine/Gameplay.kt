@@ -74,12 +74,15 @@ class Gameplay(private val settings: Settings?) {
 	private var playerExplosion: Explosion = ExplosionTypeNull()
 	private val space = Space()
 
-	// game
+	// game state
 	private var currentStageStartTime = 0L
 	@Volatile private var nextStage = 0
 	@Volatile private var nextStageStartTime = 0L
 	@Volatile private var stage = 0
 	@Volatile private var jumpKeyDown = false
+
+	private var enemiesCrashInAsteroids = true
+
 
 
 	/**
@@ -103,6 +106,8 @@ class Gameplay(private val settings: Settings?) {
 		playerBullets.reset(settings, stage)
 		nextStageStartTime = 0
 		scheduleNextStage(System.currentTimeMillis())
+
+		enemiesCrashInAsteroids = settings?.getEnemiesCrashInAsteroids() ?: true
 
 		if (!isGameThreadAlive()) {
 			if (!executor.isShutdown && !executor.isTerminated) {
@@ -425,7 +430,7 @@ class Gameplay(private val settings: Settings?) {
 			enemyBullets.resetShootTime(now)
 		}
 		enemy.aim(viewportWidth, viewportHeight,player.position(), player.radius())
-		enemy.moveAtWill(now, asteroids.getAll(), viewportWidth, viewportHeight)
+		enemy.moveAtWill(now, asteroids.getAll(), enemiesCrashInAsteroids, viewportWidth, viewportHeight)
 		enemyBullets.move(now, viewportWidth, viewportHeight)
 		if (nextStageStartTime < now && !enemy.isDead(now) && enemy.isOnScreen(viewportWidth, viewportHeight)) {
 			// shoot if: no countdown && enemy is alive && enemy is on screen
@@ -435,7 +440,7 @@ class Gameplay(private val settings: Settings?) {
 
 		checkPlayerBulletsHit(now)
 		checkEnemyBulletsHit(now)
-		checkShipAsteroidCrash(now, enemy)
+		if (enemiesCrashInAsteroids) checkShipAsteroidCrash(now, enemy)
 		checkShipAsteroidCrash(now, player)
 		checkShipCrash(now, enemy, player)
 

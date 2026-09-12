@@ -8,6 +8,7 @@ class Settings(context: android.content.Context) {
 		private const val PREFS_NAME = "SpaceBlasterSettings"
 		private const val ASTEROIDS_BUMP_KEY = "asteroids_bump"
 		private const val BULLETS_WRAP_AROUND_KEY = "bullets_wrap_around"
+		private const val ENEMIES_CRASH_IN_ASTEROIDS = "enemies_crash_in_asteroids"
 		private const val HIGH_SCORE_KEY = "high_score"
 	}
 
@@ -69,6 +70,10 @@ class Settings(context: android.content.Context) {
 
 	fun getBulletsWrapAround(): Boolean {
 		return sharedPreferences.getBoolean(BULLETS_WRAP_AROUND_KEY, true)
+	}
+
+	fun getEnemiesCrashInAsteroids(): Boolean {
+		return sharedPreferences.getBoolean(ENEMIES_CRASH_IN_ASTEROIDS, true)
 	}
 
 	fun getHighScore(): Int {
