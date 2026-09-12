@@ -2,7 +2,13 @@ package com.sidephone.spaceblaster.engine.entities.ships
 
 import com.sidephone.spaceblaster.engine.entities.getEnemySpawnPosition
 import com.sidephone.spaceblaster.engine.graphics.DrawCommandGroup
-import com.sidephone.spaceblaster.settings.Settings
+import com.sidephone.spaceblaster.settings.Settings.Saucer.FLY_TIME_MAX
+import com.sidephone.spaceblaster.settings.Settings.Saucer.FLY_TIME_MIN
+import com.sidephone.spaceblaster.settings.Settings.Saucer.SPAWN_MIN_STAGE
+import com.sidephone.spaceblaster.settings.Settings.Saucer.SPAWN_STAGE_TIME_MIN
+import com.sidephone.spaceblaster.settings.Settings.Saucer.SPAWN_WHEN_MAX_ASTEROIDS
+import com.sidephone.spaceblaster.settings.Settings.Saucer.STILL_TIME_MAX
+import com.sidephone.spaceblaster.settings.Settings.Saucer.STILL_TIME_MIN
 import kotlin.math.atan2
 import kotlin.math.cos
 import kotlin.math.max
@@ -80,11 +86,11 @@ class EnemyShip : Ship() {
 
 
 	fun isTimeToSpawn(stage: Int, stageTime: Long, asteroidCount: Int): Boolean {
-		return asteroidCount < Settings.Saucer.SPAWN_WHEN_MAX_ASTEROIDS
+		return asteroidCount < SPAWN_WHEN_MAX_ASTEROIDS
 			&& isDead
 			&& lastStage != stage
-			&& stage >= Settings.Saucer.SPAWN_MIN_STAGE
-			&& stageTime >= Settings.Saucer.SPAWN_STAGE_TIME_MIN
+			&& stage >= SPAWN_MIN_STAGE
+			&& stageTime >= SPAWN_STAGE_TIME_MIN
 	}
 
 
@@ -103,11 +109,11 @@ class EnemyShip : Ship() {
 			val angle = 360 * Math.random()
 			speedX = (shipType.maxSpeed() * cos(angle)).toFloat()
 			speedY = (shipType.maxSpeed() * sin(angle)).toFloat()
-			nextDirectionChange = now + Settings.Saucer.FLY_TIME_MIN + ((0..Settings.Saucer.FLY_TIME_MAX).random())
+			nextDirectionChange = now + (FLY_TIME_MIN..FLY_TIME_MAX).random()
 		} else {
 			speedX = 0f
 			speedY = 0f
-			nextDirectionChange = now + Settings.Saucer.STILL_TIME_MIN + ((0..Settings.Saucer.STILL_TIME_MAX).random())
+			nextDirectionChange = now + (STILL_TIME_MIN..STILL_TIME_MAX).random()
 		}
 	}
 

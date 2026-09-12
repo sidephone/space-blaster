@@ -45,9 +45,9 @@ class Settings(context: android.content.Context) {
 		const val SHOOT_DELAY_MAX = 1500L // ms
 
 		const val FLY_TIME_MIN = 400L // ms
-		const val FLY_TIME_MAX = 1250L // ms
+		const val FLY_TIME_MAX = 1650L // ms
 		const val STILL_TIME_MIN = 100L
-		const val STILL_TIME_MAX = 400L
+		const val STILL_TIME_MAX = 500L
 
 		const val SPAWN_STAGE_TIME_MIN = 30000L // ms
 		const val SPAWN_MIN_STAGE = -1 // only spawn saucers after this stage

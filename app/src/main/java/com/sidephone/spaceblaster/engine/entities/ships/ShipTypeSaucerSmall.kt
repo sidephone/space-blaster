@@ -4,7 +4,7 @@ import com.sidephone.spaceblaster.engine.graphics.DrawCommand
 
 class ShipTypeSaucerSmall : ShipTypeSaucerBig() {
 	companion object {
-		const val AIM_ACCURACY = 0.85f // 0.0 = perfect aim, 1.0 = random aim
+		const val AIM_ACCURACY = 0.85f // 1.0 = perfect aim, 0.0 = random aim
 		const val DRAW_DIRECTION = -90f // degrees, 0 is to the right, -90 is straight up
 		const val SPEED = 175f // px/sec
 		const val RADIUS = 25f
