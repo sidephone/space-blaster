@@ -8,8 +8,8 @@ import com.sidephone.spaceblaster.settings.Settings.Saucer.AVOID_ASTEROID_DISTAN
 import com.sidephone.spaceblaster.settings.Settings.Saucer.AVOID_ASTEROID_RETRIES
 import com.sidephone.spaceblaster.settings.Settings.Saucer.FLY_TIME_MAX
 import com.sidephone.spaceblaster.settings.Settings.Saucer.FLY_TIME_MIN
+import com.sidephone.spaceblaster.settings.Settings.Saucer.SPAWN_INTERVAL
 import com.sidephone.spaceblaster.settings.Settings.Saucer.SPAWN_MIN_STAGE
-import com.sidephone.spaceblaster.settings.Settings.Saucer.SPAWN_STAGE_TIME_MIN
 import com.sidephone.spaceblaster.settings.Settings.Saucer.SPAWN_WHEN_MAX_ASTEROIDS
 import com.sidephone.spaceblaster.settings.Settings.Saucer.SPAWN_WHEN_MIN_ASTEROIDS
 import com.sidephone.spaceblaster.settings.Settings.Saucer.STILL_TIME_MAX
@@ -25,7 +25,7 @@ class EnemyShip : Ship() {
 	private var avoidAsteroidsRadius = 0f
 	private var isDead = true
 	private var nextDirectionChange = 0L
-	private var lastStage = 0
+	private var lastSpawnTime = 0L
 	private var score = 0
 
 
@@ -141,12 +141,12 @@ class EnemyShip : Ship() {
 	}
 
 
-	fun isTimeToSpawn(stage: Int, stageTime: Long, asteroidCount: Int): Boolean {
+	fun isTimeToSpawn(now: Long, stage: Int, stageTime: Long, asteroidCount: Int): Boolean {
 		return asteroidCount in SPAWN_WHEN_MIN_ASTEROIDS..SPAWN_WHEN_MAX_ASTEROIDS
 			&& isDead
-			&& lastStage != stage
 			&& stage >= SPAWN_MIN_STAGE
-			&& stageTime >= SPAWN_STAGE_TIME_MIN
+			&& stageTime >= SPAWN_INTERVAL
+			&& now - lastSpawnTime >= SPAWN_INTERVAL
 	}
 
 
@@ -177,7 +177,7 @@ class EnemyShip : Ship() {
 
 
 	fun reset() {
-		lastStage = 0
+		lastSpawnTime = 0L
 		die(0)
 	}
 
@@ -205,9 +205,9 @@ class EnemyShip : Ship() {
 
 
 	fun spawnIfNeeded(now: Long, stage: Int, stageTime: Long, asteroidCount: Int, viewportWidth: Float, viewportHeight: Float): Boolean {
-		if (isTimeToSpawn(stage, stageTime, asteroidCount)) {
+		if (isTimeToSpawn(now, stage, stageTime, asteroidCount)) {
 			spawn(now, viewportWidth, viewportHeight)
-			lastStage = stage
+			lastSpawnTime = now
 			return true
 		}
 		return false

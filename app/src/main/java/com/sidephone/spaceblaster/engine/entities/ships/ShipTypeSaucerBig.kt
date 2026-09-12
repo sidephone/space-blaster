@@ -10,7 +10,7 @@ open class ShipTypeSaucerBig : ShipType {
 		const val SIZE_UNIT = RADIUS / 30f
 		const val SPEED = 125f // px/sec
 
-		const val SCORE_POINTS = 5
+		const val SCORE_POINTS = 40
 	}
 
 	object Color {
