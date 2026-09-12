@@ -13,7 +13,7 @@
 
 	<string name="setting_asteroids_bump">Solid Asteroids</string>
 	<string name="setting_asteroids_bump_on">Asteroids will bounce off each other.</string>
-	<string name="setting_asteroids_bump_off">Asteroids will pass through each other</string>
+	<string name="setting_asteroids_bump_off">Asteroids will pass through each other.</string>
 
 	<string name="setting_bullets_wrap">Bullets Wrap Around</string>
 	<string name="setting_bullets_wrap_on">Bullets will wrap around the screen.</string>

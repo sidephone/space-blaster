@@ -55,10 +55,10 @@ class Settings(context: android.content.Context) {
 		const val STILL_TIME_MIN = 100L
 		const val STILL_TIME_MAX = 500L
 
-		const val SPAWN_STAGE_TIME_MIN = 30000L // ms
-		const val SPAWN_MIN_STAGE = -1 // only spawn saucers after this stage
+		const val SPAWN_STAGE_TIME_MIN = 15000L // ms
+		const val SPAWN_MIN_STAGE = 3 // only spawn saucers after this stage
 		const val SPAWN_WHEN_MIN_ASTEROIDS = 1 // only spawn saucers if there are at least this many asteroids on screen
-		const val SPAWN_WHEN_MAX_ASTEROIDS = 6 // only spawn saucers if there are at most this many asteroids on screen
+		const val SPAWN_WHEN_MAX_ASTEROIDS = 10 // only spawn saucers if there are at most this many asteroids on screen
 	}
 
 
