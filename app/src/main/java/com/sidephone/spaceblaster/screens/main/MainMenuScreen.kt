@@ -24,6 +24,7 @@ fun MainMenuScreen(
 	isGamePaused: Boolean = false,
 	onNewGame: () -> Unit,
 	onEndGame: () -> Unit,
+	onControls : () -> Unit,
 	onSettings: () -> Unit,
 	onExit: () -> Unit
 ) {
@@ -62,6 +63,12 @@ fun MainMenuScreen(
 				text = R.string.main_end_game
 			)
 		}
+
+		MenuButton(
+			onClick = onControls,
+			modifier = Modifier.gamepadClickableButton(onControls),
+			text = R.string.main_controls
+		)
 
 		if (!isGamePaused) {
 			MenuButton(
