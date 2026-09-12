@@ -283,19 +283,21 @@ class Gameplay(private val settings: Settings?) {
 
 
 	private fun checkEnemyBulletsHit(now: Long) {
-		if (enemyBullets.hitAsteroidId() >= 0) {
-			crashAsteroid(now, enemyBullets.hitAsteroidId(), true, enemyBullets.hittingBulletDirection())
-		} else if (enemyBullets.hitPlayer()) {
+		val hitAsteroidId = enemyBullets.hit(now, asteroids.getAll())
+		if (hitAsteroidId >= 0) {
+			crashAsteroid(now, hitAsteroidId, true, enemyBullets.hittingBulletDirection())
+		} else if (enemyBullets.hit(now, player)) {
 			crashShip(now, player)
 		}
 	}
 
 
 	private fun checkPlayerBulletsHit(now: Long) {
-		if (playerBullets.hitAsteroidId() >= 0) {
-			increaseScore(asteroids.score(playerBullets.hitAsteroidId()))
-			crashAsteroid(now, playerBullets.hitAsteroidId(), true, playerBullets.hittingBulletDirection())
-		} else if (playerBullets.hitEnemy()) {
+		val hitAsteroidId = playerBullets.hit(now, asteroids.getAll())
+		if (hitAsteroidId >= 0) {
+			increaseScore(asteroids.score(hitAsteroidId))
+			crashAsteroid(now, hitAsteroidId, true, playerBullets.hittingBulletDirection())
+		} else if (playerBullets.hit(now, enemy)) {
 			increaseScore(enemy.score())
 			crashShip(now, enemy)
 		}
@@ -414,13 +416,13 @@ class Gameplay(private val settings: Settings?) {
 		player.revokeInvincibilityWhenExpired(now)
 		player.move(now, viewportWidth, viewportHeight)
 		playerExplosion.spread(now)
-		playerBullets.move(now, asteroids.getAll() + enemy, viewportWidth, viewportHeight)
+		playerBullets.move(now, viewportWidth, viewportHeight)
 
 		enemy.spawnIfNeeded(now, stage, now - currentStageStartTime, asteroids.count(), viewportWidth, viewportHeight)
 		enemy.aim(viewportWidth, viewportHeight,player.position(), player.radius())
 		enemy.moveAtWill(now, viewportWidth, viewportHeight)
 		enemyExplosion.spread(now)
-		enemyBullets.move(now, asteroids.getAll() + player, viewportWidth, viewportHeight)
+		enemyBullets.move(now, viewportWidth, viewportHeight)
 		if (!enemy.isDead(now)) {
 			enemyBullets.shoot(now, enemy.cannonPosition(), enemy.direction())
 		}
