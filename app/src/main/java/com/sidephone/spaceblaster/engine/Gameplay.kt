@@ -368,7 +368,7 @@ class Gameplay(private val settings: Settings?) {
 		playerBullets.move(now, asteroids.getAll() + enemy, viewportWidth, viewportHeight)
 
 		enemy.spawnIfNeeded(now, stage, now - currentStageStartTime, asteroids.count(), viewportWidth, viewportHeight)
-		enemy.aim(player.position())
+		enemy.aim(viewportWidth, viewportHeight,player.position(), player.radius())
 		enemy.moveAtWill(now, viewportWidth, viewportHeight)
 		enemyExplosion.spread(now)
 		enemyBullets.move(now, asteroids.getAll() + player, viewportWidth, viewportHeight)

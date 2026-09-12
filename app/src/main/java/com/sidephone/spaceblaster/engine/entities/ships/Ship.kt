@@ -11,7 +11,7 @@ import kotlin.math.sqrt
 abstract class Ship : SpaceObject {
 	protected var shipType: ShipType = ShipTypeDefender()
 
-	protected var direction: Float = 0f // degrees, 0 is to the right, -90 is straight up
+	protected var direction: Float = 0f // degrees, 0 is straight up
 	protected var x: Float = 0f // px, center of the ship
 	protected var y: Float = 0f // px, center of the ship
 	protected var speedX = 0f

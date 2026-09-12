@@ -5,7 +5,9 @@ import com.sidephone.spaceblaster.engine.graphics.DrawCommandGroup
 import com.sidephone.spaceblaster.settings.Settings
 import kotlin.math.atan2
 import kotlin.math.cos
+import kotlin.math.max
 import kotlin.math.sin
+import kotlin.math.sqrt
 
 
 class EnemyShip : Ship() {
@@ -19,18 +21,43 @@ class EnemyShip : Ship() {
 	fun score() = score
 
 
-	fun aim(target: Pair<Float, Float>) {
+	/**
+	 * All objects are circles, so we aim at the diameter that is perpendicular to the line from our
+	 * center to the target's center. If we hit that diameter, we have hit the target. To account for
+	 * our (in)accuracy, we expand the diameter by a percentage of the viewport size. The lower our
+	 * accuracy, the larger the diameter.
+	 */
+	fun aim(viewportWidth: Float, viewportHeight: Float, target: Pair<Float, Float>, targetRadius: Float) {
 		if (isDead) return
-
-		val (targetX, targetY) = target
-		direction = Math.toDegrees(atan2((targetY - y).toDouble(), (targetX - x).toDouble())).toFloat()
 
 		val accuracy = when (shipType) {
 			is ShipTypeSaucerSmall -> ShipTypeSaucerSmall.AIM_ACCURACY
 			is ShipTypeSaucerBig -> ShipTypeSaucerBig.AIM_ACCURACY
 			else -> 0f
 		}
-		direction += (Math.random() * 2 - 1).toFloat() * (1 - accuracy) * 180f
+
+		// expand the target diameter by a percentage of the viewport size based on our accuracy
+		val assumedDiameter = targetRadius * 2 + (1 - accuracy) * max(viewportWidth, viewportHeight)
+		val assumedRadius = assumedDiameter / 2
+
+		// calculate the coordinates of the diameter endpoints
+		val dx = target.first - x
+		val dy = target.second - y
+		val targetCenterDistance = sqrt((dx * dx + dy * dy).toDouble())
+		val perpDx = -dy / targetCenterDistance * assumedRadius
+		val perpDy = dx / targetCenterDistance * assumedRadius
+		val endpoint1X = target.first + perpDx
+		val endpoint1Y = target.second + perpDy
+		val endpoint2X = target.first - perpDx
+		val endpoint2Y = target.second - perpDy
+
+		// aim at a random point between the two endpoints
+		val randomFactor = Math.random().toFloat()
+		val aimX = endpoint1X + randomFactor * (endpoint2X - endpoint1X)
+		val aimY = endpoint1Y + randomFactor * (endpoint2Y - endpoint1Y)
+
+		// get the angle to the aim point
+		direction = Math.toDegrees(atan2((aimY - y), (aimX - x))).toFloat()
 	}
 
 
