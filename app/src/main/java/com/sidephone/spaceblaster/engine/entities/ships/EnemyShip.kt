@@ -150,20 +150,20 @@ class EnemyShip : Ship() {
 	}
 
 
-	fun moveAtWill(now: Long, asteroids: List<Asteroid>, viewportWidth: Float, viewportHeight: Float) {
+	fun moveAtWill(now: Long, asteroids: List<Asteroid>, canAvoidAsteroids: Boolean, viewportWidth: Float, viewportHeight: Float) {
 		if (isDead) return
 
 		val oldX = x
 		val oldY = y
 		val previousLastMoveTime = lastMoveTime
-		val avoidAsteroids = Math.random() < AVOID_ASTEROID_CHANCE
+		val avoidAsteroids = canAvoidAsteroids && Math.random() < AVOID_ASTEROID_CHANCE
 		var retries = if (avoidAsteroids) AVOID_ASTEROID_RETRIES else 1
 		var runAway = false
 
 		while (retries-- > 0) {
 			calculateNextMove(now, runAway)
 			move(now, viewportWidth, viewportHeight)
-			if (isDangerouslyApproachingAsteroid(oldX, oldY, asteroids)) {
+			if (avoidAsteroids && isDangerouslyApproachingAsteroid(oldX, oldY, asteroids)) {
 				nextDirectionChange = now
 				x = oldX
 				y = oldY
