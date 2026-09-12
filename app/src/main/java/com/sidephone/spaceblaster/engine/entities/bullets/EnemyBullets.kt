@@ -18,7 +18,7 @@ class EnemyBullets : BulletList() {
 
 	override fun shootDelay(now: Long): Long {
 		if (now >= nextShootDelayRecalculate) {
-			shootDelay = SHOOT_DELAY_MIN + ((SHOOT_DELAY_MAX - SHOOT_DELAY_MIN) * Math.random()).toLong()
+			shootDelay = (SHOOT_DELAY_MIN..SHOOT_DELAY_MAX).random()
 			nextShootDelayRecalculate = now + shootDelay
 		}
 

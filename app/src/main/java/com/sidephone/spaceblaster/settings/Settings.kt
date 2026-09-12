@@ -42,7 +42,7 @@ class Settings(context: android.content.Context) {
 	object Saucer {
 		const val BULLETS_MAX = 10
 		const val SHOOT_DELAY_MIN = 1000L // ms
-		const val SHOOT_DELAY_MAX = 1500L // ms
+		const val SHOOT_DELAY_MAX = 2500L // ms
 
 		const val FLY_TIME_MIN = 400L // ms
 		const val FLY_TIME_MAX = 1650L // ms
@@ -51,7 +51,8 @@ class Settings(context: android.content.Context) {
 
 		const val SPAWN_STAGE_TIME_MIN = 30000L // ms
 		const val SPAWN_MIN_STAGE = -1 // only spawn saucers after this stage
-		const val SPAWN_WHEN_MAX_ASTEROIDS = 5 // only spawn saucers if there are less than this many asteroids on screen
+		const val SPAWN_WHEN_MIN_ASTEROIDS = 1 // only spawn saucers if there are less than this many asteroids on screen
+		const val SPAWN_WHEN_MAX_ASTEROIDS = 6 // only spawn saucers if there are less than this many asteroids on screen
 	}
 
 

@@ -7,6 +7,7 @@ import com.sidephone.spaceblaster.settings.Settings.Saucer.FLY_TIME_MIN
 import com.sidephone.spaceblaster.settings.Settings.Saucer.SPAWN_MIN_STAGE
 import com.sidephone.spaceblaster.settings.Settings.Saucer.SPAWN_STAGE_TIME_MIN
 import com.sidephone.spaceblaster.settings.Settings.Saucer.SPAWN_WHEN_MAX_ASTEROIDS
+import com.sidephone.spaceblaster.settings.Settings.Saucer.SPAWN_WHEN_MIN_ASTEROIDS
 import com.sidephone.spaceblaster.settings.Settings.Saucer.STILL_TIME_MAX
 import com.sidephone.spaceblaster.settings.Settings.Saucer.STILL_TIME_MIN
 import kotlin.math.atan2
@@ -106,7 +107,7 @@ class EnemyShip : Ship() {
 
 
 	fun isTimeToSpawn(stage: Int, stageTime: Long, asteroidCount: Int): Boolean {
-		return asteroidCount < SPAWN_WHEN_MAX_ASTEROIDS
+		return asteroidCount in SPAWN_WHEN_MIN_ASTEROIDS..SPAWN_WHEN_MAX_ASTEROIDS
 			&& isDead
 			&& lastStage != stage
 			&& stage >= SPAWN_MIN_STAGE
@@ -131,9 +132,10 @@ class EnemyShip : Ship() {
 		super.spawn(now, viewportWidth, viewportHeight)
 		shipType = if ((0..1).random() == 0) ShipTypeSaucerBig() else ShipTypeSaucerSmall()
 
-		getEnemySpawnPosition(viewportWidth, viewportHeight, shipType.radius()).let { (spawnX, spawnY) ->
+		getEnemySpawnPosition(viewportWidth, viewportHeight, shipType.radius()).let { (spawnX, spawnY, spawnDirection) ->
 			x = spawnX
 			y = spawnY
+			direction = spawnDirection
 		}
 		isDead = false
 		nextDirectionChange = 0L
