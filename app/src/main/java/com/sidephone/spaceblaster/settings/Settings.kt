@@ -69,16 +69,34 @@ class Settings(context: android.content.Context) {
 		return sharedPreferences.getBoolean(ASTEROIDS_BUMP_KEY, true)
 	}
 
+	fun setAsteroidsBump(value: Boolean) {
+		sharedPreferences.edit { putBoolean(ASTEROIDS_BUMP_KEY, value) }
+	}
+
 	fun getBulletsWrapAround(): Boolean {
 		return sharedPreferences.getBoolean(BULLETS_WRAP_AROUND_KEY, true)
+	}
+
+	fun setBulletsWrapAround(value: Boolean) {
+		sharedPreferences.edit { putBoolean(BULLETS_WRAP_AROUND_KEY, value) }
 	}
 
 	fun getEnemiesAllowed(): Boolean {
 		return sharedPreferences.getBoolean(ENEMIES_ALLOWED, true)
 	}
 
+	fun setEnemiesAllowed(value: Boolean) {
+		sharedPreferences.edit { putBoolean(ENEMIES_ALLOWED, value) }
+	}
+
 	fun getEnemiesCrashInAsteroids(): Boolean {
-		return getEnemiesAllowed() && sharedPreferences.getBoolean(ENEMIES_CRASH_IN_ASTEROIDS, true)
+		return sharedPreferences.getBoolean(ENEMIES_CRASH_IN_ASTEROIDS, true)
+	}
+
+	fun setEnemiesCrashInAsteroids(value: Boolean) {
+		if (getEnemiesAllowed()) {
+			sharedPreferences.edit { putBoolean(ENEMIES_CRASH_IN_ASTEROIDS, value) }
+		}
 	}
 
 	fun getHighScore(): Int {
@@ -96,10 +114,13 @@ class Settings(context: android.content.Context) {
 	}
 
 	private fun getHighScoreKey(): String {
-		return HIGH_SCORE_KEY +
+		var key = HIGH_SCORE_KEY +
 			ASTEROIDS_BUMP_KEY + getAsteroidsBump() +
 			BULLETS_WRAP_AROUND_KEY + getBulletsWrapAround() +
-			ENEMIES_ALLOWED + getEnemiesAllowed() +
-			ENEMIES_CRASH_IN_ASTEROIDS + getEnemiesCrashInAsteroids()
+			ENEMIES_ALLOWED + getEnemiesAllowed()
+
+		if (getEnemiesAllowed()) key += ENEMIES_CRASH_IN_ASTEROIDS + getEnemiesCrashInAsteroids()
+
+		return key
 	}
 }
