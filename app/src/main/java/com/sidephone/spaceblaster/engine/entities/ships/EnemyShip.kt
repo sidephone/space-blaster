@@ -67,6 +67,26 @@ class EnemyShip : Ship() {
 	}
 
 
+	private fun calculateMovementChange(now: Long) {
+		if (now < nextDirectionChange) {
+			return
+		}
+
+		isThrusting = !isThrusting
+
+		if (isThrusting) {
+			val angle = 360 * Math.random()
+			speedX = (shipType.maxSpeed() * cos(angle)).toFloat()
+			speedY = (shipType.maxSpeed() * sin(angle)).toFloat()
+			nextDirectionChange = now + (FLY_TIME_MIN..FLY_TIME_MAX).random()
+		} else {
+			speedX = 0f
+			speedY = 0f
+			nextDirectionChange = now + (STILL_TIME_MIN..STILL_TIME_MAX).random()
+		}
+	}
+
+
 	override fun die(now: Long) {
 		isDead = true
 
@@ -96,25 +116,8 @@ class EnemyShip : Ship() {
 
 	fun moveAtWill(now: Long, viewportWidth: Float, viewportHeight: Float) {
 		if (isDead) return
-
+		calculateMovementChange(now)
 		move(now, viewportWidth, viewportHeight)
-
-		if (now < nextDirectionChange) {
-			return
-		}
-
-		isThrusting = !isThrusting
-
-		if (isThrusting) {
-			val angle = 360 * Math.random()
-			speedX = (shipType.maxSpeed() * cos(angle)).toFloat()
-			speedY = (shipType.maxSpeed() * sin(angle)).toFloat()
-			nextDirectionChange = now + (FLY_TIME_MIN..FLY_TIME_MAX).random()
-		} else {
-			speedX = 0f
-			speedY = 0f
-			nextDirectionChange = now + (STILL_TIME_MIN..STILL_TIME_MAX).random()
-		}
 	}
 
 
@@ -142,7 +145,7 @@ class EnemyShip : Ship() {
 	}
 
 
-	fun  spawnIfNeeded(now: Long, stage: Int, stageTime: Long, asteroidCount: Int, viewportWidth: Float, viewportHeight: Float) {
+	fun spawnIfNeeded(now: Long, stage: Int, stageTime: Long, asteroidCount: Int, viewportWidth: Float, viewportHeight: Float) {
 		if (isTimeToSpawn(stage, stageTime, asteroidCount)) {
 			spawn(now, viewportWidth, viewportHeight)
 			lastStage = stage
