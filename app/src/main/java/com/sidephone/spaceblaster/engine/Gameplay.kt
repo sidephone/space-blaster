@@ -392,19 +392,19 @@ class Gameplay(private val settings: Settings?) {
 			player.turn(now, left = leftPressed)
 		}
 
-		if (KeyEvent.KEYCODE_BUTTON_X in keys || KeyEvent.KEYCODE_DPAD_DOWN in keys) {
+		if (KeyEvent.KEYCODE_BUTTON_Y in keys || KeyEvent.KEYCODE_DPAD_DOWN in keys) {
 			player.stop(now)
 		} else {
-			player.thrust(now, KeyEvent.KEYCODE_BUTTON_A in keys || KeyEvent.KEYCODE_DPAD_UP in keys)
+			player.thrust(now, KeyEvent.KEYCODE_BUTTON_B in keys || KeyEvent.KEYCODE_DPAD_UP in keys)
 		}
 
-		if ((KeyEvent.KEYCODE_BUTTON_B in keys || KeyEvent.KEYCODE_SPACE in keys) && !player.isDead(now)) {
+		if ((KeyEvent.KEYCODE_BUTTON_A in keys || KeyEvent.KEYCODE_SPACE in keys) && !player.isDead(now)) {
 			playerBullets.shoot(now, player.cannonPosition(), player.direction())
 		} else {
 			playerBullets.resetShootTime(0L)
 		}
 
-		if (KeyEvent.KEYCODE_BUTTON_Y in keys || KeyEvent.KEYCODE_DEL in keys) {
+		if (KeyEvent.KEYCODE_BUTTON_X in keys || KeyEvent.KEYCODE_DEL in keys) {
 			jumpKeyDown = true
 		} else if (jumpKeyDown) {
 			jumpKeyDown = false
