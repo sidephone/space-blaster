@@ -282,13 +282,63 @@ class Gameplay(private val settings: Settings?) {
 	}
 
 
-	private fun crashAsteroid(now: Long, asteroidId: Int, blastDirection: Float) {
+	private fun checkEnemyAsteroidCrash(now: Long) {
+		val crashedAsteroid = asteroids.oneCrashesWithEnemy()
+		if (crashedAsteroid >= 0) {
+			crashShip(now, enemy)
+			crashAsteroid(now, crashedAsteroid, false, enemy.speedDirection())
+		}
+	}
+
+
+	private fun checkEnemyBulletsHit(now: Long) {
+		if (enemyBullets.hitAsteroidId() >= 0) {
+			crashAsteroid(now, enemyBullets.hitAsteroidId(), true, enemyBullets.hittingBulletDirection())
+		} else if (enemyBullets.hitPlayer()) {
+			crashShip(now, player)
+		}
+	}
+
+
+	private fun checkPlayerAsteroidCrash(now: Long) {
+		val crashedAsteroid = asteroids.oneCrashesWithPlayer()
+		if (crashedAsteroid >= 0) {
+			increaseScore(asteroids.score(crashedAsteroid))
+			crashShip(now, player)
+			crashAsteroid(now, crashedAsteroid, false, player.speedDirection())
+		}
+	}
+
+
+	private fun checkPlayerBulletsHit(now: Long) {
+		if (playerBullets.hitAsteroidId() >= 0) {
+			increaseScore(asteroids.score(playerBullets.hitAsteroidId()))
+			crashAsteroid(now, playerBullets.hitAsteroidId(), true, playerBullets.hittingBulletDirection())
+		} else if (playerBullets.hitEnemy()) {
+			increaseScore(enemy.score())
+			crashShip(now, enemy)
+		}
+	}
+
+
+	private fun checkPlayerEnemyCrash(now: Long) {
+		if (player.shouldBump(now, enemy)) {
+			increaseScore(enemy.score())
+			crashShip(now, player)
+			crashShip(now, enemy)
+		}
+	}
+
+
+	private fun crashAsteroid(now: Long, asteroidId: Int, byBullet: Boolean, blastDirection: Float) {
 		asteroidExplosion = ExplosionTypeAsteroid(now, asteroids.position(asteroidId))
-		asteroids.split(asteroidId, blastDirection,true, viewportWidth, viewportHeight)
+		asteroids.split(asteroidId, blastDirection,byBullet, viewportWidth, viewportHeight)
 	}
 
 
 	private fun crashShip(now: Long, ship: Ship) {
+		if (ship.isDead(now)) return
+
 		if (ship is PlayerShip) {
 			playerExplosion = ExplosionTypeShip(now, ship.position())
 		} else if (ship is EnemyShip) {
@@ -379,38 +429,11 @@ class Gameplay(private val settings: Settings?) {
 		asteroidExplosion.spread(now)
 		asteroids.move(now, player, enemy, viewportWidth, viewportHeight)
 
-		if (playerBullets.hitAsteroidId() >= 0) {
-			increaseScore(asteroids.score(playerBullets.hitAsteroidId()))
-			crashAsteroid(now, playerBullets.hitAsteroidId(), playerBullets.hittingBulletDirection())
-		} else if (playerBullets.hitEnemy()) {
-			increaseScore(enemy.score())
-			crashShip(now, enemy)
-		}
-
-		var crashedAsteroid = asteroids.oneCrashesWithPlayer()
-		if (crashedAsteroid >= 0) {
-			increaseScore(asteroids.score(crashedAsteroid))
-			crashShip(now, player)
-			crashAsteroid(now, crashedAsteroid, player.speedDirection())
-		}
-
-		crashedAsteroid = asteroids.oneCrashesWithEnemy()
-		if (crashedAsteroid >= 0) {
-			crashShip(now, enemy)
-			crashAsteroid(now, crashedAsteroid, enemy.speedDirection())
-		}
-
-		if (enemyBullets.hitAsteroidId() >= 0) {
-			crashAsteroid(now, enemyBullets.hitAsteroidId(), enemyBullets.hittingBulletDirection())
-		} else if (enemyBullets.hitPlayer()) {
-			crashShip(now, player)
-		}
-
-		if (player.shouldBump(now, enemy)) {
-			increaseScore(enemy.score())
-			crashShip(now, player)
-			crashShip(now, enemy)
-		}
+		checkPlayerBulletsHit(now)
+		checkEnemyBulletsHit(now)
+		checkPlayerAsteroidCrash(now)
+		checkEnemyAsteroidCrash(now)
+		checkPlayerEnemyCrash(now)
 
 		startScheduledNextStage(now)
 
