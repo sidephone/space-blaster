@@ -10,7 +10,10 @@ class ShipTypeDefender : ShipType {
 		const val MAX_SPEED = 175f // px/sec
 		const val TURN_SPEED = 250f // degrees/sec
 
+		// the model is drawn facing up, but since 0 degrees is to the right, we need to rotate it
+		// to appear and fly in the correct direction
 		const val DRAW_DIRECTION = -90f // degrees, 0 is to the right, -90 is straight up
+
 		const val RADIUS = 25f
 		const val SIZE_UNIT = RADIUS / 25.5f
 	}
@@ -57,41 +60,13 @@ class ShipTypeDefender : ShipType {
 	private var drawCommandCache = emptyList<DrawCommand>()
 
 
-	override fun drawDirection(): Float {
-		// the model is drawn facing up, but since 0 degrees is to the right, we need to rotate it
-		// to appear and fly in the correct direction
-		return DRAW_DIRECTION
-	}
-
-
-	override fun acceleration(): Float {
-		return ACCELERATION
-	}
-
-
-	override fun braking(): Float {
-		return BRAKING
-	}
-
-
-	override fun cannonLength(): Float {
-		return abs(Fuselage.TOP_Y)
-	}
-
-
-	override fun maxSpeed(): Float {
-		return MAX_SPEED
-	}
-
-
-	override fun turnSpeed(): Float {
-		return TURN_SPEED
-	}
-
-
-	override fun radius(): Float {
-		return RADIUS
-	}
+	override fun acceleration() = ACCELERATION
+	override fun braking() = BRAKING
+	override fun cannonLength() = abs(Fuselage.TOP_Y)
+	override fun drawDirection() = DRAW_DIRECTION
+	override fun maxSpeed() = MAX_SPEED
+	override fun radius() = RADIUS
+	override fun turnSpeed() = TURN_SPEED
 
 
 	override fun draw(now: Long, thrusting: Boolean): List<DrawCommand> {

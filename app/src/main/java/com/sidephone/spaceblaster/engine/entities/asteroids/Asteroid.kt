@@ -95,26 +95,9 @@ class Asteroid : SpaceObject {
 	 * centers <= sum of radii) AND are currently approaching each other
 	 */
 	fun shouldBump(now: Long, other: SpaceObject): Boolean {
-		if (other.notBumpable(now)) return false
-
-		val dx = other.position().first - x
-		val dy = other.position().second - y
-		val centerDistance = sqrt(dx * dx + dy * dy)
-		val surfaceDistance = radius() + other.radius()
-
-		if (centerDistance > surfaceDistance) {
-			return false
-		}
-
-		// Approaching if the relative velocity, projected onto the line
-		// connecting the two centers, points from us toward the other
-		// (i.e. the distance between them is decreasing).
-		val relativeSpeedX = speedX - other.speed().first
-		val relativeSpeedY = speedY - other.speed().second
-		val closingSpeed = relativeSpeedX * dx + relativeSpeedY * dy
-
-		return closingSpeed > 0f
+		return super.shouldBump(now, speedX, speedY, other)
 	}
+
 
 	/**
 	 * Re-calculate the speed of this asteroid and `other` when they collide, assuming a perfectly

@@ -7,7 +7,7 @@ import com.sidephone.spaceblaster.settings.Settings
 import kotlin.math.cos
 import kotlin.math.sin
 
-class Bullet(isEnemy: Boolean, private val canWrap: Boolean) {
+class Bullet(private val isEnemy: Boolean, private val canWrap: Boolean) {
 	companion object {
 		const val COLOR_ENEMY = 0xFFFF4C00.toInt()
 		const val COLOR_PLAYER = 0xFF9ADAC5.toInt()
@@ -35,6 +35,7 @@ class Bullet(isEnemy: Boolean, private val canWrap: Boolean) {
 
 
 	fun direction() = direction
+	fun isEnemy() = isEnemy
 	fun isIdle() = !isAirborne
 
 

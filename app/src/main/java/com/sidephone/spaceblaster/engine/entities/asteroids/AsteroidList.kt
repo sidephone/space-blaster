@@ -1,7 +1,6 @@
 package com.sidephone.spaceblaster.engine.entities.asteroids
 
 import com.sidephone.spaceblaster.engine.entities.ships.Ship
-import com.sidephone.spaceblaster.engine.graphics.DrawCommandGroup
 import com.sidephone.spaceblaster.settings.Settings.Asteroids.MAX
 import com.sidephone.spaceblaster.settings.Settings.Asteroids.MIN
 import com.sidephone.spaceblaster.settings.Settings.Asteroids.NEW_EVERY_N_STAGES
@@ -10,34 +9,20 @@ class AsteroidList {
 	private val asteroids: MutableList<Asteroid> = mutableListOf()
 
 	private var bumpAsteroids = false
-	private var bumpsWithPlayer: Int = -1
 
 
+	fun clear() { asteroids.clear() }
+	fun count() = asteroids.size
+	fun draw() = asteroids.map { asteroid -> asteroid.draw() }
+	fun isEmpty() = asteroids.isEmpty()
 	fun getAll() = asteroids.toList()
+	fun position(index: Int) = asteroids.getOrNull(index)?.position()
+	fun score(index: Int): Int = asteroids.getOrNull(index)?.score() ?: 0
 
 
-	fun clear() {
-		asteroids.clear()
-	}
-
-
-	fun draw(): List<DrawCommandGroup> {
-		return asteroids.map { asteroid -> asteroid.draw() }
-	}
-
-
-	fun isEmpty(): Boolean {
-		return asteroids.isEmpty()
-	}
-
-
-	fun move(now: Long, player: Ship, viewportWidth: Float, viewportHeight: Float) {
-		bumpsWithPlayer = -1
-
+	fun move(now: Long, viewportWidth: Float, viewportHeight: Float) {
 		for ((i, asteroid) in asteroids.withIndex()) {
-			if (asteroid.shouldBump(now, player)) {
-				bumpsWithPlayer = i
-			} else if (bumpAsteroids) {
+			if (bumpAsteroids) {
 				for (otherIndex in i + 1 until asteroids.size) {
 					if (asteroid.shouldBump(now, asteroids[otherIndex])) {
 						asteroid.bump(asteroids[otherIndex])
@@ -50,35 +35,18 @@ class AsteroidList {
 	}
 
 
-	fun oneCrashesWithPlayer(): Int {
-		return bumpsWithPlayer
-	}
-
-
-	fun position(index: Int): Pair<Float, Float>? {
-		if (index < 0 || index >= asteroids.size) {
-			return null
+	fun oneCrashesWith(now: Long, ship: Ship): Int {
+		for ((i, asteroid) in asteroids.withIndex()) {
+			if (asteroid.shouldBump(now, ship)) {
+				return i
+			}
 		}
 
-		return asteroids[index].position()
+		return -1
 	}
 
 
-	fun score(index: Int): Int {
-		if (index < 0 || index >= asteroids.size) {
-			return 0
-		}
-
-		return asteroids[index].score()
-	}
-
-
-	fun spawn(
-		areAsteroidsBumpable: Boolean,
-		stage: Int,
-		viewportWidth: Float,
-		viewportHeight: Float
-	) {
+	fun spawn(areAsteroidsBumpable: Boolean, stage: Int, viewportWidth: Float, viewportHeight: Float) {
 		bumpAsteroids = areAsteroidsBumpable
 
 		asteroids.clear()

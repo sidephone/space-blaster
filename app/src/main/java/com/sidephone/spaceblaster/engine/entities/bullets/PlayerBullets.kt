@@ -22,5 +22,5 @@ class PlayerBullets : BulletList() {
 		}
 	}
 
-	override fun shootDelay() = shootDelay
+	override fun shootDelay(now: Long) = shootDelay
 }

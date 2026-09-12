@@ -125,7 +125,7 @@ class PlayerShip : Ship() {
 	}
 
 
-	override fun resetLives() {
+	fun resetLives() {
 		_lives.value = STARTING_LIVES
 		_isDeadForever.value = _lives.value <= 0
 	}
@@ -135,11 +135,6 @@ class PlayerShip : Ship() {
 		if (isDeadForever.value) return
 
 		super.spawn(now, viewportWidth, viewportHeight)
-		getPlayerSpawnPosition(viewportWidth, viewportHeight).also{
-			x = it.x
-			y = it.y
-			direction = it.direction + shipType.drawDirection()
-		}
 		isInvincible = true
 		invincibilityTimeout = now + INVINCIBILITY_DURATION
 		lastDeathTime = 0L
@@ -148,5 +143,13 @@ class PlayerShip : Ship() {
 		beforeJumpY = 0f
 		jumpInEndTime = 0L
 		jumpOutEndTime = 0L
+
+		shipType = ShipTypeDefender()
+
+		getPlayerSpawnPosition(viewportWidth, viewportHeight).also{
+			x = it.x
+			y = it.y
+			direction = it.direction + shipType.drawDirection()
+		}
 	}
 }

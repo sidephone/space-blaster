@@ -11,7 +11,7 @@ import kotlin.math.sqrt
 abstract class Ship : SpaceObject {
 	protected var shipType: ShipType = ShipTypeDefender()
 
-	protected var direction: Float = 0f // degrees, 0 is to the right, -90 is straight up
+	protected var direction: Float = 0f // degrees, 0 is straight up
 	protected var x: Float = 0f // px, center of the ship
 	protected var y: Float = 0f // px, center of the ship
 	protected var speedX = 0f
@@ -31,7 +31,6 @@ abstract class Ship : SpaceObject {
 	abstract fun die(now: Long)
 	abstract fun draw(now: Long): DrawCommandGroup
 	abstract fun isDead(now: Long): Boolean
-	abstract fun resetLives()
 
 
 	override fun notBumpable(now: Long): Boolean = isDead(now)
@@ -56,21 +55,29 @@ abstract class Ship : SpaceObject {
 		val dt = ((now - lastMoveTime) / 1000f).coerceAtMost(moveDtMax)
 		lastMoveTime = now
 
-		x += speedX * dt
-		y += speedY * dt
+		val dx = speedX * dt
+		val dy = speedY * dt
+
+		x += dx
+		y += dy
 
 		// wrap around the screen edges
-		if (x < 0) x = viewportWidth
-		if (y < 0) y = viewportHeight
-		if (x > viewportWidth) x = 0f
-		if (y > viewportHeight) y = 0f
+		if (x < 0 && dx < 0) x = viewportWidth
+		if (y < 0 && dy < 0) y = viewportHeight
+		if (x > viewportWidth && dx > 0) x = 0f
+		if (y > viewportHeight && dy > 0) y = 0f
+	}
+
+
+	fun shouldBump(now: Long, other: SpaceObject): Boolean {
+		return super.shouldBump(now, speedX, speedY, other)
 	}
 
 
 	open fun spawn(now: Long, viewportWidth: Float, viewportHeight: Float) {
-		shipType = ShipTypeDefender()
-
-		direction = shipType.drawDirection()
+		x = 0f
+		y = 0f
+		direction = 0f
 		speedX = 0f
 		speedY = 0f
 		accelerationMax = shipType.acceleration() / Settings.Gameplay.TARGET_IPS.toFloat()

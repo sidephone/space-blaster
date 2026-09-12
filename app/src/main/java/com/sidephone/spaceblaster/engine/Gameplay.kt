@@ -9,12 +9,15 @@ import com.sidephone.spaceblaster.engine.entities.Hud
 import com.sidephone.spaceblaster.engine.entities.HyperspaceJump
 import com.sidephone.spaceblaster.engine.entities.Space
 import com.sidephone.spaceblaster.engine.entities.asteroids.AsteroidList
+import com.sidephone.spaceblaster.engine.entities.bullets.EnemyBullets
 import com.sidephone.spaceblaster.engine.entities.bullets.PlayerBullets
 import com.sidephone.spaceblaster.engine.entities.explosions.Explosion
 import com.sidephone.spaceblaster.engine.entities.explosions.ExplosionTypeAsteroid
 import com.sidephone.spaceblaster.engine.entities.explosions.ExplosionTypeNull
 import com.sidephone.spaceblaster.engine.entities.explosions.ExplosionTypeShip
+import com.sidephone.spaceblaster.engine.entities.ships.EnemyShip
 import com.sidephone.spaceblaster.engine.entities.ships.PlayerShip
+import com.sidephone.spaceblaster.engine.entities.ships.Ship
 import com.sidephone.spaceblaster.engine.graphics.DrawCommandGroup
 import com.sidephone.spaceblaster.engine.graphics.GameFrame
 import com.sidephone.spaceblaster.settings.Settings
@@ -61,17 +64,18 @@ class Gameplay(private val settings: Settings?) {
 	// game objects
 	private var asteroids = AsteroidList()
 	private var asteroidExplosion: Explosion = ExplosionTypeNull()
-
+	private val enemy = EnemyShip()
+	private val enemyBullets = EnemyBullets()
+	private var enemyExplosion: Explosion = ExplosionTypeNull()
+	private val hud = Hud()
 	private var hyperspaceJump = HyperspaceJump()
-
 	private val player = PlayerShip()
 	private val playerBullets = PlayerBullets()
 	private var playerExplosion: Explosion = ExplosionTypeNull()
-
-	private val hud = Hud()
 	private val space = Space()
 
-	// game state
+	// game
+	private var currentStageStartTime = 0L
 	@Volatile private var nextStage = 0
 	@Volatile private var nextStageStartTime = 0L
 	@Volatile private var stage = 0
@@ -92,6 +96,8 @@ class Gameplay(private val settings: Settings?) {
 
 		space.bigBang(viewportWidth, viewportHeight)
 		asteroids.clear()
+		enemy.reset()
+		enemyBullets.reset(settings, stage)
 		player.resetLives()
 		player.spawn(System.currentTimeMillis(), viewportWidth, viewportHeight)
 		playerBullets.reset(settings, stage)
@@ -276,6 +282,73 @@ class Gameplay(private val settings: Settings?) {
 	}
 
 
+	private fun checkEnemyBulletsHit(now: Long) {
+		val hitAsteroidId = enemyBullets.hit(now, asteroids.getAll())
+		if (hitAsteroidId >= 0) {
+			crashAsteroid(now, hitAsteroidId, true, enemyBullets.hittingBulletDirection())
+		} else if (enemyBullets.hit(now, player)) {
+			crashShip(now, player)
+		}
+	}
+
+
+	private fun checkPlayerBulletsHit(now: Long) {
+		val hitAsteroidId = playerBullets.hit(now, asteroids.getAll())
+		if (hitAsteroidId >= 0) {
+			increaseScore(asteroids.score(hitAsteroidId))
+			crashAsteroid(now, hitAsteroidId, true, playerBullets.hittingBulletDirection())
+		} else if (playerBullets.hit(now, enemy)) {
+			increaseScore(enemy.score())
+			crashShip(now, enemy)
+		}
+	}
+
+
+	private fun checkShipCrash(now: Long, shipA: Ship, shipB: Ship) {
+		if (shipA.shouldBump(now, shipB)) {
+			if (shipA is PlayerShip && shipB is EnemyShip) {
+				increaseScore(shipB.score())
+			} else if (shipB is PlayerShip && shipA is EnemyShip) {
+				increaseScore(shipA.score())
+			}
+
+			crashShip(now, shipA)
+			crashShip(now, shipB)
+		}
+	}
+
+
+	private fun checkShipAsteroidCrash(now: Long, ship: Ship) {
+		val crashedAsteroid = asteroids.oneCrashesWith(now, ship)
+		if (crashedAsteroid < 0) return
+
+		if (ship is PlayerShip) {
+			increaseScore(asteroids.score(crashedAsteroid))
+		}
+
+		crashShip(now, ship)
+		crashAsteroid(now, crashedAsteroid, false, ship.speedDirection())
+	}
+
+
+	private fun crashAsteroid(now: Long, asteroidId: Int, byBullet: Boolean, blastDirection: Float) {
+		asteroidExplosion = ExplosionTypeAsteroid(now, asteroids.position(asteroidId))
+		asteroids.split(asteroidId, blastDirection,byBullet, viewportWidth, viewportHeight)
+	}
+
+
+	private fun crashShip(now: Long, ship: Ship) {
+		if (ship.isDead(now)) return
+
+		if (ship is PlayerShip) {
+			playerExplosion = ExplosionTypeShip(now, ship.position())
+		} else if (ship is EnemyShip) {
+			enemyExplosion = ExplosionTypeShip(now, ship.position())
+		}
+		ship.die(now)
+	}
+
+
 	private fun increaseScore(points: Int) {
 		if (_score.value % BONUS_LIVE_POINTS > (_score.value + points) % BONUS_LIVE_POINTS) {
 			player.addLife()
@@ -321,7 +394,7 @@ class Gameplay(private val settings: Settings?) {
 		if ((KeyEvent.KEYCODE_BUTTON_B in keys || KeyEvent.KEYCODE_SPACE in keys) && !player.isDead(now)) {
 			playerBullets.shoot(now, player.cannonPosition(), player.direction())
 		} else {
-			playerBullets.resetShootTime()
+			playerBullets.resetShootTime(0L)
 		}
 
 		if (KeyEvent.KEYCODE_BUTTON_Y in keys || KeyEvent.KEYCODE_DEL in keys) {
@@ -343,43 +416,33 @@ class Gameplay(private val settings: Settings?) {
 		player.revokeInvincibilityWhenExpired(now)
 		player.move(now, viewportWidth, viewportHeight)
 		playerExplosion.spread(now)
-		playerBullets.move(now, asteroids.getAll(), viewportWidth, viewportHeight)
+		playerBullets.move(now, viewportWidth, viewportHeight)
+
+		if (enemy.spawnIfNeeded(now, stage, now - currentStageStartTime, asteroids.count(), viewportWidth, viewportHeight)) {
+			enemyBullets.resetShootTime(now)
+		}
+		enemy.aim(viewportWidth, viewportHeight,player.position(), player.radius())
+		enemy.moveAtWill(now, viewportWidth, viewportHeight)
+		enemyExplosion.spread(now)
+		enemyBullets.move(now, viewportWidth, viewportHeight)
+
+		// shoot if: no countdown && enemy is alive && enemy is on screen
+		if (nextStageStartTime < now && !enemy.isDead(now) && enemy.isOnScreen(viewportWidth, viewportHeight)) {
+			enemyBullets.shoot(now, enemy.cannonPosition(), enemy.direction())
+		}
 
 		asteroidExplosion.spread(now)
-		asteroids.move(now, player, viewportWidth, viewportHeight)
+		asteroids.move(now, viewportWidth, viewportHeight)
 
-		if (playerBullets.hitTargetId() >= 0) {
-			increaseScore(asteroids.score(playerBullets.hitTargetId()))
-			asteroidExplosion = ExplosionTypeAsteroid(now, asteroids.position(playerBullets.hitTargetId()))
-			asteroids.split(
-				playerBullets.hitTargetId(),
-				playerBullets.hittingBulletDirection(),
-				true,
-				viewportWidth,
-				viewportHeight
-			)
-		}
-
-		val crashedAsteroid = asteroids.oneCrashesWithPlayer()
-		if (crashedAsteroid >= 0) {
-			player.die(now)
-			playerExplosion = ExplosionTypeShip(now, player.position())
-
-			increaseScore(asteroids.score(crashedAsteroid))
-
-			asteroidExplosion = ExplosionTypeAsteroid(now, asteroids.position(crashedAsteroid))
-			asteroids.split(
-				crashedAsteroid,
-				player.speedDirection(),
-				false,
-				viewportWidth,
-				viewportHeight
-			)
-		}
+		checkPlayerBulletsHit(now)
+		checkEnemyBulletsHit(now)
+		checkShipAsteroidCrash(now, enemy)
+		checkShipAsteroidCrash(now, player)
+		checkShipCrash(now, enemy, player)
 
 		startScheduledNextStage(now)
 
-		if (asteroids.isEmpty()) {
+		if (asteroids.isEmpty() && !player.isDead(now) && enemy.isDead(now)) {
 			scheduleNextStage(now)
 		}
 	}
@@ -390,9 +453,12 @@ class Gameplay(private val settings: Settings?) {
 		val screenObjects = mutableListOf<DrawCommandGroup>()
 		screenObjects.add(space.draw(now))
 		screenObjects.addAll(playerBullets.draw())
+		screenObjects.addAll(enemyBullets.draw())
 		screenObjects.addAll(asteroids.draw())
 		screenObjects.add(player.draw(now))
+		screenObjects.add(enemy.draw(now))
 		screenObjects.add(asteroidExplosion.draw(now))
+		screenObjects.add(enemyExplosion.draw(now))
 		screenObjects.add(playerExplosion.draw(now))
 		screenObjects.addAll(hud.draw(now, viewportWidth, viewportHeight, player, nextStageStartTime))
 		hyperspaceJump.draw(now)?.let { screenObjects.addAll(it) }
@@ -419,6 +485,7 @@ class Gameplay(private val settings: Settings?) {
 		}
 
 		stage = nextStage
+		currentStageStartTime = now
 		asteroids.spawn(
 			settings?.getAsteroidsBump() == true,
 			stage,
