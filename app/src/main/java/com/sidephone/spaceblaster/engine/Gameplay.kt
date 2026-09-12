@@ -371,7 +371,7 @@ class Gameplay(private val settings: Settings?) {
 	 */
 	@MainThread
 	private fun preprocessInput() {
-		if (KeyEvent.KEYCODE_BUTTON_START in pressedKeys) {
+		if (KeyEvent.KEYCODE_BUTTON_START in pressedKeys || KeyEvent.KEYCODE_DPAD_CENTER in pressedKeys || KeyEvent.KEYCODE_ENTER in pressedKeys) {
 			onStartButton()
 		}
 	}
@@ -386,25 +386,30 @@ class Gameplay(private val settings: Settings?) {
 	private fun processGameInput(now: Long) {
 		val keys = pressedKeys.toSet() // make a copy for thread safety
 
-		val leftPressed = KeyEvent.KEYCODE_DPAD_LEFT in keys
-		val rightPressed = KeyEvent.KEYCODE_DPAD_RIGHT in keys
+		val brakePressed = KeyEvent.KEYCODE_BUTTON_Y in keys || KeyEvent.KEYCODE_O in keys || KeyEvent.KEYCODE_DPAD_DOWN in keys || KeyEvent.KEYCODE_6 in keys
+		val jumpPressed = KeyEvent.KEYCODE_BUTTON_X in keys || KeyEvent.KEYCODE_U in keys || KeyEvent.KEYCODE_5 in keys
+		val leftPressed = KeyEvent.KEYCODE_DPAD_LEFT in keys || KeyEvent.KEYCODE_A in keys  || KeyEvent.KEYCODE_1 in keys
+		val rightPressed = KeyEvent.KEYCODE_DPAD_RIGHT in keys || KeyEvent.KEYCODE_D in keys || KeyEvent.KEYCODE_2 in keys
+		val shootPressed = KeyEvent.KEYCODE_BUTTON_A in keys || KeyEvent.KEYCODE_J in keys || KeyEvent.KEYCODE_SPACE in keys || KeyEvent.KEYCODE_8 in keys
+		val thrustPressed = KeyEvent.KEYCODE_BUTTON_B in keys || KeyEvent.KEYCODE_L in keys || KeyEvent.KEYCODE_DPAD_UP in keys || KeyEvent.KEYCODE_9 in keys
+
 		if (leftPressed xor rightPressed) {
 			player.turn(now, left = leftPressed)
 		}
 
-		if (KeyEvent.KEYCODE_BUTTON_Y in keys || KeyEvent.KEYCODE_DPAD_DOWN in keys) {
+		if (brakePressed) {
 			player.stop(now)
 		} else {
-			player.thrust(now, KeyEvent.KEYCODE_BUTTON_B in keys || KeyEvent.KEYCODE_DPAD_UP in keys)
+			player.thrust(now, thrustPressed)
 		}
 
-		if ((KeyEvent.KEYCODE_BUTTON_A in keys || KeyEvent.KEYCODE_SPACE in keys) && !player.isDead(now)) {
+		if (shootPressed && !player.isDead(now)) {
 			playerBullets.shoot(now, player.cannonPosition(), player.direction())
 		} else {
 			playerBullets.resetShootTime(0L)
 		}
 
-		if (KeyEvent.KEYCODE_BUTTON_X in keys || KeyEvent.KEYCODE_DEL in keys) {
+		if (jumpPressed) {
 			jumpKeyDown = true
 		} else if (jumpKeyDown) {
 			jumpKeyDown = false
