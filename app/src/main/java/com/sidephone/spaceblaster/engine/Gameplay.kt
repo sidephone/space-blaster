@@ -282,30 +282,11 @@ class Gameplay(private val settings: Settings?) {
 	}
 
 
-	private fun checkEnemyAsteroidCrash(now: Long) {
-		val crashedAsteroid = asteroids.oneCrashesWithEnemy()
-		if (crashedAsteroid >= 0) {
-			crashShip(now, enemy)
-			crashAsteroid(now, crashedAsteroid, false, enemy.speedDirection())
-		}
-	}
-
-
 	private fun checkEnemyBulletsHit(now: Long) {
 		if (enemyBullets.hitAsteroidId() >= 0) {
 			crashAsteroid(now, enemyBullets.hitAsteroidId(), true, enemyBullets.hittingBulletDirection())
 		} else if (enemyBullets.hitPlayer()) {
 			crashShip(now, player)
-		}
-	}
-
-
-	private fun checkPlayerAsteroidCrash(now: Long) {
-		val crashedAsteroid = asteroids.oneCrashesWithPlayer()
-		if (crashedAsteroid >= 0) {
-			increaseScore(asteroids.score(crashedAsteroid))
-			crashShip(now, player)
-			crashAsteroid(now, crashedAsteroid, false, player.speedDirection())
 		}
 	}
 
@@ -321,12 +302,30 @@ class Gameplay(private val settings: Settings?) {
 	}
 
 
-	private fun checkPlayerEnemyCrash(now: Long) {
-		if (player.shouldBump(now, enemy)) {
-			increaseScore(enemy.score())
-			crashShip(now, player)
-			crashShip(now, enemy)
+	private fun checkShipCrash(now: Long, shipA: Ship, shipB: Ship) {
+		if (shipA.shouldBump(now, shipB)) {
+			if (shipA is PlayerShip && shipB is EnemyShip) {
+				increaseScore(shipB.score())
+			} else if (shipB is PlayerShip && shipA is EnemyShip) {
+				increaseScore(shipA.score())
+			}
+
+			crashShip(now, shipA)
+			crashShip(now, shipB)
 		}
+	}
+
+
+	private fun checkShipAsteroidCrash(now: Long, ship: Ship) {
+		val crashedAsteroid = asteroids.oneCrashesWith(now, ship)
+		if (crashedAsteroid < 0) return
+
+		if (ship is PlayerShip) {
+			increaseScore(asteroids.score(crashedAsteroid))
+		}
+
+		crashShip(now, ship)
+		crashAsteroid(now, crashedAsteroid, false, ship.speedDirection())
 	}
 
 
@@ -427,13 +426,13 @@ class Gameplay(private val settings: Settings?) {
 		}
 
 		asteroidExplosion.spread(now)
-		asteroids.move(now, player, enemy, viewportWidth, viewportHeight)
+		asteroids.move(now, viewportWidth, viewportHeight)
 
 		checkPlayerBulletsHit(now)
 		checkEnemyBulletsHit(now)
-		checkPlayerAsteroidCrash(now)
-		checkEnemyAsteroidCrash(now)
-		checkPlayerEnemyCrash(now)
+		checkShipAsteroidCrash(now, enemy)
+		checkShipAsteroidCrash(now, player)
+		checkShipCrash(now, enemy, player)
 
 		startScheduledNextStage(now)
 
