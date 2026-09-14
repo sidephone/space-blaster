@@ -1,6 +1,8 @@
 package com.sidephone.spaceblaster.engine.entities.ships
 
 import com.sidephone.spaceblaster.engine.entities.HyperspaceJump
+import com.sidephone.spaceblaster.engine.entities.SpaceObject
+import com.sidephone.spaceblaster.engine.entities.asteroids.Asteroid
 import com.sidephone.spaceblaster.engine.entities.getPlayerSpawnPosition
 import com.sidephone.spaceblaster.engine.graphics.DrawCommandGroup
 import com.sidephone.spaceblaster.settings.Settings.Player.INVINCIBILITY_DURATION
@@ -9,6 +11,8 @@ import com.sidephone.spaceblaster.settings.Settings.Player.STARTING_LIVES
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlin.math.abs
+import kotlin.math.atan2
+import kotlin.math.sqrt
 
 class PlayerShip : Ship() {
 	private var isInvincible = false
@@ -43,6 +47,39 @@ class PlayerShip : Ship() {
 		if (now - lastDeathTime >= RESPAWN_DELAY) {
 			spawn(now, viewportWidth, viewportHeight)
 		}
+	}
+
+
+	fun burn(now: Long, other: SpaceObject): Boolean {
+		if (!isThrusting || isDead(now)) return false
+
+		// check if the other object is within range to be burned
+		val dx = other.position().first - x
+		val dy = other.position().second - y
+		val distance = sqrt((dx * dx + dy * dy).toDouble())
+		val burnDistance = other.radius() + shipType.radius() + shipType.thrustFireLength()
+
+		if (distance > burnDistance) return false
+
+		// check if the other object is behind the ship (i.e., within the thrust fire cone)
+		val angleToOther = Math.toDegrees(atan2(dy.toDouble(), dx.toDouble())) + 180
+		val angleDifference = (angleToOther - direction + 360) % 360
+		val halfConeAngle = shipType.thrustFireHalfWidth()
+
+		return angleDifference <= halfConeAngle || angleDifference >= 360 - halfConeAngle
+	}
+
+
+	fun burn(now: Long, asteroids: List<Asteroid>): Int {
+		if (!isThrusting || isDead(now)) return -1
+
+		for ((index, asteroid) in asteroids.withIndex()) {
+			if (burn(now, asteroid)) {
+				return index
+			}
+		}
+
+		return -1
 	}
 
 

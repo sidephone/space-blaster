@@ -32,6 +32,7 @@ class ShipTypeDefender : ShipType {
 		const val PHASE_TIME = 60L // ms, time for each flame phase
 		val LENGTHS = floatArrayOf(15f, 21f, 17f, 24f, 18f, 22f)
 		val OFFSETS = floatArrayOf(0f, -1.5f, 1f, -2f, 2f, -0.5f)
+		val LENGTH = (LENGTHS.average() + LENGTHS.max()).toFloat() / 2f
 	}
 
 	object Fuselage {
@@ -66,6 +67,8 @@ class ShipTypeDefender : ShipType {
 	override fun drawDirection() = DRAW_DIRECTION
 	override fun maxSpeed() = MAX_SPEED
 	override fun radius() = RADIUS
+	override fun thrustFireLength() = Fire.LENGTH
+	override fun thrustFireHalfWidth() = Fire.HALF_WIDTH
 	override fun turnSpeed() = TURN_SPEED
 
 

@@ -26,7 +26,8 @@ class Settings(context: android.content.Context) {
 	}
 
 	object Player {
-		const val BONUS_LIVE_POINTS = 400
+		const val BONUS_LIVE_POINTS = 400 // award an extra life every X points
+		const val BURN_ENEMY_POINTS_MULTIPLIER = 2 // when burning an enemy, multiply the points by this factor
 		const val INVINCIBILITY_DURATION = 2000L // ms
 		const val RESPAWN_DELAY = 1500L // ms
 		const val STARTING_LIVES = 3

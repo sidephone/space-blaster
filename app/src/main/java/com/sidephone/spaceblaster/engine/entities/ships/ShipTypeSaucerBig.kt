@@ -43,6 +43,8 @@ open class ShipTypeSaucerBig : ShipType {
 	override fun drawDirection() = DRAW_DIRECTION
 	override fun maxSpeed() = SPEED
 	override fun radius() = RADIUS
+	override fun thrustFireLength() = 0f
+	override fun thrustFireHalfWidth() = 0f
 	override fun turnSpeed() = 0f
 
 
