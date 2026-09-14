@@ -10,5 +10,7 @@ interface ShipType {
 	fun drawDirection(): Float
 	fun maxSpeed(): Float
 	fun radius(): Float
+	fun thrustFireLength(): Float
+	fun thrustFireHalfWidth(): Float
 	fun turnSpeed(): Float
 }

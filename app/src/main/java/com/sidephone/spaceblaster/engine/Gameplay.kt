@@ -22,6 +22,7 @@ import com.sidephone.spaceblaster.engine.graphics.DrawCommandGroup
 import com.sidephone.spaceblaster.engine.graphics.GameFrame
 import com.sidephone.spaceblaster.settings.Settings
 import com.sidephone.spaceblaster.settings.Settings.Player.BONUS_LIVE_POINTS
+import com.sidephone.spaceblaster.settings.Settings.Player.BURN_ENEMY_POINTS_MULTIPLIER
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import java.util.concurrent.Executors
@@ -311,6 +312,18 @@ class Gameplay(private val settings: Settings?) {
 	}
 
 
+	private fun checkPlayerBurnsEnemy(now: Long) {
+		val burnedAsteroidId = player.burn(now, asteroids.getAll())
+		if (burnedAsteroidId >= 0) {
+			increaseScore(asteroids.score(burnedAsteroidId) * BURN_ENEMY_POINTS_MULTIPLIER)
+			crashAsteroid(now, burnedAsteroidId, false, player.direction() + 180f)
+		} else if (player.burn(now, enemy)) {
+			increaseScore(enemy.score() * BURN_ENEMY_POINTS_MULTIPLIER)
+			crashShip(now, enemy)
+		}
+	}
+
+
 	private fun checkShipCrash(now: Long, shipA: Ship, shipB: Ship) {
 		if (shipA.shouldBump(now, shipB)) {
 			if (shipA is PlayerShip && shipB is EnemyShip) {
@@ -447,6 +460,7 @@ class Gameplay(private val settings: Settings?) {
 
 		checkPlayerBulletsHit(now)
 		checkEnemyBulletsHit(now)
+		checkPlayerBurnsEnemy(now)
 		if (enemiesCrashInAsteroids) checkShipAsteroidCrash(now, enemy)
 		checkShipAsteroidCrash(now, player)
 		checkShipCrash(now, enemy, player)
