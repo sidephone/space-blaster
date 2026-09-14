@@ -316,7 +316,7 @@ class Gameplay(private val settings: Settings?) {
 		val burnedAsteroidId = player.burn(now, asteroids.getAll())
 		if (burnedAsteroidId >= 0) {
 			increaseScore(asteroids.score(burnedAsteroidId) * BURN_ENEMY_POINTS_MULTIPLIER)
-			crashAsteroid(now, burnedAsteroidId, false, -player.speedDirection())
+			crashAsteroid(now, burnedAsteroidId, false, player.direction() + 180f)
 		} else if (player.burn(now, enemy)) {
 			increaseScore(enemy.score() * BURN_ENEMY_POINTS_MULTIPLIER)
 			crashShip(now, enemy)
