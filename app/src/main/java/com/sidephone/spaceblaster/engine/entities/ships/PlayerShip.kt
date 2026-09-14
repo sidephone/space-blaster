@@ -51,7 +51,7 @@ class PlayerShip : Ship() {
 
 
 	fun burn(now: Long, other: SpaceObject): Boolean {
-		if (!isThrusting || isDead(now)) return false
+		if (!isThrusting || isDead(now) || other.notBumpable(now)) return false
 
 		// check if the other object is within range to be burned
 		val dx = other.position().first - x
